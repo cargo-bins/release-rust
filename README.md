@@ -92,9 +92,13 @@ The action needs no dependencies and runs on all hosted-spec runners (or compati
 | `extra-rustc-flags` | _optional_ | Extra flags to pass to rustc (RUSTFLAGS). |
 | `extra-cosign-flags` | _optional_ | Extra flags to pass to cosign. |
 | __📦 Packaging options__ |||
-| `package-format` | `'zip'` | [Packaging format](#packaging). |
+| `package-archive` | `'zip'` | [Packaging archive format](#packaging). |
 | `package-files` | _optional_ | Newline-separated list of file globs to include in the package in addition to compiled binaries. |
-| `package-dir` | `'packages/'` | Directory to write finished packages to. |
+| `package-name` | `'{crate_name}-{target}-{version}'` | Name of the package, excluding the extension. |
+| `package-in-dir` | `true` | Wrap the package contents in a directory with the same name before archiving. |
+| `package-separately` | `false` | Package each crate separately. |
+| `package-short-ext` | `false` | Use the short variant of the archive extension, if relevant for the format. E.g. `tgz` instead of `tar.gz`. |
+| `package-output` | `'packages/'` | Path to write finished packages to. |
 | __🚢 Github release__ |||
 | `release-notes` | _optional_ | Body of the github release. |
 | `release-name` | _version_ | Name of the github release. |
