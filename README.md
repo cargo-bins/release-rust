@@ -56,7 +56,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: cargo-bins/release-rust
-     with:
+      with:
        github-token: ${{ secrets.GITHUB_TOKEN }}
        crates-token: ${{ secrets.CRATES_TOKEN }}
        target: ${{ matrix.t }}
@@ -173,3 +173,6 @@ All outputs of a Github Action are strings.
 ### Custom build command
 
 ### With multiple crates
+
+## Examples
+
