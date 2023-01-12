@@ -113,6 +113,14 @@ The action needs no dependencies and runs on all hosted-spec runners (or compati
 
 ### Checkout
 
+You're responsible for checking out the repository at the right commit for the build. In most cases,
+this will be the default behaviour of `actions/checkout@v3`, but in some situations you may need to
+specify its `ref` input.
+
+This action also does not bump versions or commit to the repository. You can use [release-pr] for
+that if you want a PR-based workflow, push to the repository directly, or use a different tool. It's
+up to you.
+
 ### Packaging
 
 ## Outputs
