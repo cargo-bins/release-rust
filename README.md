@@ -1,18 +1,32 @@
 # Action: release-rust
 
-An all-in-one action to build, optimise, tag, checksum, sign, and publish a Cargo-based Rust project.
+An all-in-one action to build, optimise, tag, sign, and publish a Cargo-based Rust project.
 
 ## Purpose
 
-This action...
+This action is your one-stop shop for building and publishing a Rust project. It will:
+- Install the Rust toolchain and target, including necessary components
+- Use [cross] for cross-compilation if needed
+- Enable some useful compiler options by default, like:
+  + building the standard library (`-Z build-std`),
+  + codegen units for maximum optimisations (`-C codegen-units=1`),
+  + static linking of libgcc for musl builds (`-C link-arg=-static-libgcc`),
+  + outputting split debuginfo (`-C split-debuginfo=packed`).
+- Package binaries and support files in an archive
+- Sign the archive with [sigstore]
+- Tag the release if it isn't already, and sign the tag with sigstore
+- Publish the crate to crates.io
+- Publish the archives to GitHub Releases
 
-The action can be used standalone, as part of your own release workflow, or alongside our own
-[release-pr] and [release-meta] actions. See the `onrelease` workflow in the test repo for
-[a complete example](https://github.com/passcod/cargo-release-pr-test/blob/main/.github/workflows/onrelease.yml)
+Sounds complicated? Fear not! In most cases, using this action is a 5-line job.
+
+It can be used standalone, as part of your own release workflow, or alongside our own [release-pr]
+and [release-meta] actions. See the `onrelease` workflow in the test repo for [a complete example]
 of the latter.
 
 [release-pr]: https://github.com/cargo-bins/release-pr
 [release-meta]: https://github.com/cargo-bins/release-meta
+[a complete example]: https://github.com/passcod/cargo-release-pr-test/blob/main/.github/workflows/onrelease.yml
 
 ## Usage
 
