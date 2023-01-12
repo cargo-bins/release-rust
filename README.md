@@ -94,7 +94,7 @@ The action needs no dependencies and runs on all hosted-spec runners (or compati
 | __📦 Packaging options__ |||
 | `package-archive` | `'zip'` | [Packaging archive format](#packaging). |
 | `package-files` | _optional_ | Newline-separated list of file globs to include in the package in addition to compiled binaries. |
-| `package-name` | `'{crate_name}-{target}-{version}'` | Name of the package, excluding the extension. |
+| `package-name` | `'{crate}-{target}-{version}'` | Name of the package, excluding the extension. |
 | `package-in-dir` | `true` | Wrap the package contents in a directory with the same name before archiving. |
 | `package-separately` | `false` | Package each crate separately. |
 | `package-short-ext` | `false` | Use the short variant of the archive extension, if relevant for the format. E.g. `tgz` instead of `tar.gz`. |
@@ -145,7 +145,7 @@ placeholders can be used:
 
 - `{target}`: The target being built for.
 
-- `{crate_name}`: The name of the crate being built. If all crates are being built, this will be
+- `{crate}`: The name of the crate being built. If all crates are being built, this will be
   the name of the first binary crate in lexicographic order. If the `crates` input is given, this
   will be the name of the first crate in the resolved list.
 
