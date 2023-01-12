@@ -1,5 +1,5 @@
 name: Cargo Release builder, packager, publisher
-description: All-in-one action to build, optimise, tag, checksum, sign, and publish a Cargo-based Rust project.
+description: All-in-one action to build, optimise, tag, sign, and publish a Cargo-based Rust project.
 branding:
   icon: 'umbrella'
   color: 'orange'

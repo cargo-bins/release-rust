@@ -2,7 +2,7 @@
 	"name": "release-rust",
 	"publish": false,
 	"version": "0.0.0",
-	"description": "All-in-one action to build, optimise, tag, checksum, sign, and publish a Cargo-based Rust project.",
+	"description": "All-in-one action to build, optimise, tag, sign, and publish a Cargo-based Rust project.",
 	"main": "lib/main.js",
 	"scripts": {
 		"build": "tsc",
