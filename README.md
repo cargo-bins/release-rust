@@ -168,9 +168,56 @@ All outputs of a Github Action are strings.
 
 ### Hooks
 
+(describe lifecycle/flow)
+
+(hooks run even if their section is disabled, so can be used as replacement functionality)
+
 ### Custom build command
+
+(TODO: document expected output, e.g. binaries in target/...)
 
 ### With multiple crates
 
 ## Examples
 
+### Basic usage
+
+### Running on tags
+
+(disable tagging)
+
+### Installing compile-time dependencies
+
+(post-setup command with runner.os and target interpolation to install compiler-rt for musl)
+
+### Custom command: justfile
+
+(+ post-setup command using cargo-binstall to install just)
+
+### Custom command: bazel
+
+(TODO: pick a project using bazel or make or whatever and write it a config)
+
+### Compile out panic messages
+
+(use extra flags to set build-std=abort etc)
+
+### Multiple crates with globs
+
+### Publish all crates that need publishing
+
+### Publishing to crates.io before or after packaging anything
+
+(TODO: dependent job before/after the action, disable publish-crate)
+
+### Extra signing attestations
+
+(with extra cosign flags)
+
+### Distribute signatures alongside packages
+
+(use extra cosign flags to write sig to outside, use post-package hook to bring sig files back in)
+
+### Sign using GPG instead
+
+(disable sigstore, using post-sign hook to sign and write sig to outside, use post-package hook to bring sig files back in)
