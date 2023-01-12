@@ -134,8 +134,6 @@ maximum compression setting is used.
 | `tar+bzip2` | Posix (pax) TAR archive, with BZIP2 compression. |
 | `tar+xz` | Posix (pax) TAR archive, with XZ compression. |
 | `tar+zstd` | Posix (pax) TAR archive, with ZSTD compression. |
-| `7z` | 7-zip archive. |
-| `dmg` | macOS disk image. |
 
 There's no support to select different formats based on the target: if you wish to, you should make
 that logic yourself in the workflow, prior to calling this action.
