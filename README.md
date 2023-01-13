@@ -276,7 +276,7 @@ manually as well.
     post-setup: |
       cargo binstall -y --force just
       just ci-install-deps
-    custom-build: just package
+    custom-build: just build
 ```
 
 ### Custom build: meson
