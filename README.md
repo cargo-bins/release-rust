@@ -85,10 +85,10 @@ The action needs no dependencies and runs on all hosted-spec runners (or compati
 | __🪝 Hooks__ |||
 | `post-setup` | _optional_ | Script to run after toolchain setup, but before building. |
 | `custom-build` | _optional_ | Completely [custom build script](#custom-build). Compilation options and extra cargo/rustc flags will be ignored if this is set. |
-| `post-build` | _optional_ | Scrip to run after building, but before packaging. |
-| `post-package` | _optional_ | Scrip to run after packaging, but before signing. |
-| `post-sign` | _optional_ | Scrip to run after signing, but before publishing. |
-| `post-publish` | _optional_ | Scrip to run after publishing. |
+| `post-build` | _optional_ | Script to run after building, but before packaging. |
+| `post-package` | _optional_ | Script to run after packaging, but before signing. |
+| `post-sign` | _optional_ | Script to run after signing, but before publishing. |
+| `post-publish` | _optional_ | Script to run after publishing. |
 | `hooks-shell` | `'bash'` | Shell to use for all hooks. |
 
 ### Checkout
