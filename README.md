@@ -259,7 +259,25 @@ finishes setting up the build environment.
 
 ### Custom build: justfile
 
-(+ post-setup command using cargo-binstall to install just)
+Here we have [a project][cargo-binstall] that uses [just] to build the project. The [post-setup hook](#hooks) is also
+used here to install the `just` CLI tool, it does so using [cargo-binstall] which is installed by the action as part of
+setup. Because `custom-build` is used, the action won't install the `rust-src` component by default, so we add it
+manually as well.
+
+[just]: https://just.systems
+
+```yaml
+- uses: cargo-bins/release-rust
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    extra-rustup-components: rust-src
+    post-setup: |
+      cargo binstall -y --force just
+      just ci-install-deps
+    custom-build: just package
+```
 
 ### Custom build: bazel
 
