@@ -166,6 +166,18 @@ All outputs of a Github Action are strings.
 
 (describe lifecycle/flow)
 
+Hooks run in different working directories:
+
+| Hook | Working directory |
+|:-:|:-|
+| `post-setup` | Runs in the working directory of the action (usually the top of the repo). |
+| `custom-build` | Runs in the working directory of the action. |
+| `post-build` | Runs in the working directory of the action. |
+| `pre-package` | Runs in a temporary directory filled with the built binaries and other `package-files`. |
+| `post-package` | Runs in the `package-output` directory. |
+| `post-sign` | Runs in the `package-output` directory. |
+| `post-publish` | Runs in the working directory of the action. |
+
 (hooks run even if their section is disabled, so can be used as replacement functionality)
 
 ### Custom build
