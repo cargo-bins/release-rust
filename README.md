@@ -27,6 +27,9 @@ of the latter.
 [release-pr]: https://github.com/cargo-bins/release-pr
 [release-meta]: https://github.com/cargo-bins/release-meta
 [a complete example]: https://github.com/passcod/cargo-release-pr-test/blob/main/.github/workflows/onrelease.yml
+[cargo-binstall]: https://github.com/cargo-bins/cargo-binstall
+[cross]: https://github.com/cross-rs/cross
+[sigstore]: https://sigstore.dev
 
 ## Usage
 
@@ -80,12 +83,13 @@ The action needs no dependencies and runs on all hosted-spec runners (or compati
 | `release-name` | _version_ | Name of the github release. |
 | `release-tag` | _version_ | Tag to create for the release, or to use if it already exists. |
 | __🪝 Hooks__ |||
-| `post-setup-command` | _optional_ | Command to run after toolchain setup, but before building. |
-| `build-command` | _optional_ | Completely [custom build command](#custom-build-command). Compilation options and extra cargo/rustc flags will be ignored if this is set. |
-| `post-build-command` | _optional_ | Command to run after building, but before packaging. |
-| `post-package-command` | _optional_ | Command to run after packaging, but before signing. |
-| `post-sign-command` | _optional_ | Command to run after signing, but before publishing. |
-| `post-publish-command` | _optional_ | Command to run after publishing. |
+| `post-setup` | _optional_ | Script to run after toolchain setup, but before building. |
+| `custom-build` | _optional_ | Completely [custom build script](#custom-build). Compilation options and extra cargo/rustc flags will be ignored if this is set. |
+| `post-build` | _optional_ | Scrip to run after building, but before packaging. |
+| `post-package` | _optional_ | Scrip to run after packaging, but before signing. |
+| `post-sign` | _optional_ | Scrip to run after signing, but before publishing. |
+| `post-publish` | _optional_ | Scrip to run after publishing. |
+| `hooks-shell` | `'bash'` | Shell to use for all hooks. |
 
 ### Checkout
 
@@ -148,7 +152,7 @@ All outputs of a Github Action are strings.
 
 (hooks run even if their section is disabled, so can be used as replacement functionality)
 
-### Custom build command
+### Custom build
 
 (TODO: document expected output, e.g. binaries in target/...)
 
@@ -235,19 +239,39 @@ jobs:
 
 ### Installing compile-time dependencies
 
-(post-setup command with runner.os and target interpolation to install compiler-rt for musl)
+Here we build a project that requires [compiler-rt] (provided in Ubuntu by `libblocksruntime-dev`), but only for the
+`x86_64-unknown-linux-musl` target. The [post-setup hook](#hooks) is used to install the dependency after the action
+finishes setting up the build environment.
 
-### Custom command: justfile
+[compiler-rt]: https://compiler-rt.llvm.org
+
+```yaml
+- uses: cargo-bins/release-rust
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    post-setup: |
+      if [ "${{ runner.os }}" = "Linux" ] && [ "${{ matrix.target }}" = "x86_64-unknown-linux-musl" ]; then
+        sudo apt install -y libblocksruntime-dev # for compiler-rt
+      fi
+```
+
+### Custom build: justfile
 
 (+ post-setup command using cargo-binstall to install just)
 
-### Custom command: bazel
+### Custom build: bazel
 
 (TODO: pick a project using bazel or make or whatever and write it a config)
 
 ### Compile out panic messages
 
 (use extra flags to set build-std=abort etc)
+
+### Universal binaries on macOS
+
+(use release-lipo action to combine binaries post-release)
 
 ### Multiple crates with globs
 
