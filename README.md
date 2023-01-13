@@ -18,7 +18,7 @@ This action is your one-stop shop for building and publishing a Rust project. It
 - Publish the crate to crates.io
 - Publish the archives to GitHub Releases
 
-Sounds complicated? Fear not! In most cases, using this action is a 5-line job.
+Sounds complicated? Fear not! In most cases, using this action is the job of a few lines of YAML.
 
 It can be used standalone, as part of your own release workflow, or alongside our own [release-pr]
 and [release-meta] actions. See the `onrelease` workflow in the test repo for [a complete example]
@@ -35,6 +35,12 @@ of the latter.
 ## Usage
 
 ```yaml
+permissions:
+  id-token: write
+  contents: write
+
+steps:
+- uses: actions/checkout@v3
 - uses: cargo-bins/release-rust@v1
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -92,6 +98,12 @@ The action needs no dependencies and runs on all hosted-spec runners (or compati
 | `post-sign` | _optional_ | Script to run after signing, but before publishing. |
 | `post-publish` | _optional_ | Script to run after publishing. |
 | `hooks-shell` | `'bash'` | Shell to use for all hooks. |
+
+### Github token permissions
+
+The github token needs to have:
+- `write` permission for `id-token` (OIDC for signing)
+- `write` permission for `contents` (releases and tags)
 
 ### Checkout
 
@@ -194,6 +206,10 @@ jobs:
 
     name: ${{ matrix.t }}
     runs-on: ${{ matrix.o }}
+    permissions:
+      id-token: write
+      contents: write
+
     steps:
     - uses: actions/checkout@v3
     - uses: cargo-bins/release-rust@v1
@@ -229,6 +245,10 @@ jobs:
 
     name: ${{ matrix.t }}
     runs-on: ${{ matrix.o }}
+    permissions:
+      id-token: write
+      contents: write
+
     steps:
     - uses: actions/checkout@v3
     - uses: cargo-bins/release-rust@v1
