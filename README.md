@@ -95,6 +95,7 @@ The action needs no dependencies and runs on all hosted-spec runners (or compati
 | `post-setup` | _optional_ | Script to run after toolchain setup, but before building. |
 | `custom-build` | _optional_ | Completely [custom build script](#custom-build). Compilation options and extra cargo/rustc flags will be ignored if this is set. |
 | `post-build` | _optional_ | Script to run after building, but before packaging. |
+| `pre-package` | _optional_ | Script to run immediately before packaging. |
 | `post-package` | _optional_ | Script to run after packaging, but before signing. |
 | `post-sign` | _optional_ | Script to run after signing, but before publishing. |
 | `post-publish` | _optional_ | Script to run after publishing. |
