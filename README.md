@@ -282,7 +282,7 @@ finishes setting up the build environment.
 ### Custom build: justfile
 
 Here we have [a project][cargo-binstall] that uses [just] to build the project. The [post-setup hook](#hooks) is also
-used here to install the `just` CLI tool, it does so using [cargo-binstall] which is installed by the action as part of
+used here to install the `just` CLI tool: it does so using [cargo-binstall] which is installed by the action as part of
 setup. Because `custom-build` is used, the action won't install the `rust-src` component by default, so we add it
 manually as well.
 
