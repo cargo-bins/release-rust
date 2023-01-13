@@ -444,9 +444,76 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-### Multiple crates with globs
+### Filtering crates
+
+Within a workspace, sometimes only a subset of crates should be build and packaged. This set of
+crates is adjustable with the `crates` option, which takes a newline-separated list of crate names:
+
+```yaml
+- uses: cargo-bins/release-rust@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    crates: |
+      my-crate
+      my-other-crate
+```
+
+When there are many crates with similar names, you can use glob patterns to match them:
+
+```yaml
+- uses: cargo-bins/release-rust@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    crates: |
+      *-cli
+      other-tool
+```
+
+How this works is that the action will run `cargo metadata` to get a list of all crates in the
+workspace, then filter that list by the glob patterns.
+
+You can also use negative patterns to exclude crates:
+
+```yaml
+- uses: cargo-bins/release-rust@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    crates: |
+      *-cli
+      !not-this-cli
+```
+
+You should take care to [read through the behaviour section for multiple crate publishing](#with-multiple-crates).
+Notably, you may want to set the first crate in the list explicitly as it may affect names and tags.
+
+### Filtering binaries
+
+By default, all binaries in the workspace, or in the set of crates being built, will be packaged. To
+filter these, use the `pre-package` hook to run a script that will remove unwanted binaries:
+
+```yaml
+- uses: cargo-bins/release-rust@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    pre-package: |
+      rm -r example{-,_}tool{,.*}
+```
+
+The `{-,_}` and `{,.*}` expressions will match both the binary on unix and windows, and the
+debuginfo packages for that binary, without matching files that start with the same thing, like
+`example-tool*` would.
 
 ### Publish all crates that need publishing
+
+(only concerns crates.io publishing, all crates (or all `crates`) will be built/packaged regardless)
 
 ### Publishing to crates.io before or after packaging anything
 
