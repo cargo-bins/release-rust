@@ -64,9 +64,10 @@ The action needs no dependencies and runs on all hosted-spec runners (or compati
 | `binstall-version` | _latest_ | Specify the [cargo-binstall] version to use. |
 | __✂️ Function switches__ |||
 | `publish-crate` | `true` | Set to `false` to disable publishing to crates.io. |
+| `publish-crate-only` | `false` | Set to `true` to _only_ publish to crates.io. See [Crates.io publish only mode](#cratesio-publish-only-mode) for how this affects hooks. |
 | `publish-release` | `true` | Set to `false` to disable publishing a GitHub release. Packages will be left in the `packages/` directory. |
 | `use-cross` | `'auto'` | Force use of cross to compile. By default, will use cross if the target is not the host target. |
-| `sigstore` | `true` | Set to `false` to disable signing tags and packages with sigstore. Requires the github token to be enabled for OIDC. |
+| `use-sigstore` | `true` | Set to `false` to disable signing tags and packages with sigstore. |
 | __⚒️ Compilation options__ |||
 | `crates` | _all binary crates_ | Newline-separated list of crate globs to build within the workspace. |
 | `features` | _optional_ | Newline-separated features to enable when building. |
@@ -171,6 +172,30 @@ All outputs of a Github Action are strings.
 (TODO: document expected output, e.g. binaries in target/...)
 
 ### With multiple crates
+
+### Crates.io publish only mode
+
+When `publish-crate-only` is `true`, the action will only publish to crates.io. This is useful in
+some cases like [splitting the crates.io publish and the rest](#publishing-to-cratesio-before-or-after-packaging-anything)
+as the toolchain setup can then be easily kept consistent between the two jobs.
+
+In that mode:
+- The toolchain setup is performed, but without any default components.
+- The `post-setup` hook is run, if set.
+- The crate is immediately published to crates.io.
+- Everything else is skipped: other hooks, the build, packaging, tagging, the release, etc.
+- The action will fail if the crate is already published at that version (in normal mode, such failures are ignored).
+
+If you want to _only_ publish to crates.io and _not_ then package the binaries, you should not use
+this action, and do something like this instead:
+
+```yaml
+- uses: actions/checkout@v3
+- run: |
+    rustup toolchain install stable --profile minimal --no-self-update
+    rustup default stable
+- run: cargo publish
+```
 
 ## Examples
 
@@ -407,6 +432,56 @@ jobs:
 ### Publish all crates that need publishing
 
 ### Publishing to crates.io before or after packaging anything
+
+You may want to control _when_ the crate is published to crates.io, or stop the release if it fails.
+This cannot be done directly with this action, as by nature it will run in parallel across the job's
+target matrix. However, you can set up a dependent job that runs before or after the release job:
+
+```yaml
+name: Release on tag push
+on:
+  push:
+    tag: v*.*.*
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cargo-bins/release-rust@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        crates-token: ${{ secrets.CRATES_TOKEN }}
+        publish-crate-only: true
+
+  release:
+    needs: publish
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - { o: macos-latest,    t: x86_64-apple-darwin        }
+        - { o: macos-latest,    t: aarch64-apple-darwin       }
+        - { o: ubuntu-latest,   t: x86_64-unknown-linux-musl  }
+        - { o: ubuntu-latest,   t: aarch64-unknown-linux-musl }
+        - { o: windows-latest,  t: x86_64-pc-windows-msvc     }
+        - { o: windows-latest,  t: aarch64-pc-windows-msvc    }
+
+    name: ${{ matrix.t }}
+    runs-on: ${{ matrix.o }}
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cargo-bins/release-rust@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        target: ${{ matrix.t }}
+        publish-tag: false
+        publish-crate: false
+```
 
 (TODO: dependent job before/after the action, disable publish-crate)
 
