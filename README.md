@@ -34,7 +34,7 @@ of the latter.
 ## Usage
 
 ```yaml
-- uses: cargo-bins/release-rust
+- uses: cargo-bins/release-rust@v1
   with:
    github-token: ${{ secrets.GITHUB_TOKEN }}
    crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -194,7 +194,7 @@ jobs:
     runs-on: ${{ matrix.o }}
     steps:
     - uses: actions/checkout@v3
-    - uses: cargo-bins/release-rust
+    - uses: cargo-bins/release-rust@v1
       with:
        github-token: ${{ secrets.GITHUB_TOKEN }}
        crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -229,7 +229,7 @@ jobs:
     runs-on: ${{ matrix.o }}
     steps:
     - uses: actions/checkout@v3
-    - uses: cargo-bins/release-rust
+    - uses: cargo-bins/release-rust@v1
       with:
        github-token: ${{ secrets.GITHUB_TOKEN }}
        crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -246,7 +246,7 @@ finishes setting up the build environment.
 [compiler-rt]: https://compiler-rt.llvm.org
 
 ```yaml
-- uses: cargo-bins/release-rust
+- uses: cargo-bins/release-rust@v1
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -267,7 +267,7 @@ manually as well.
 [just]: https://just.systems
 
 ```yaml
-- uses: cargo-bins/release-rust
+- uses: cargo-bins/release-rust@v1
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -290,7 +290,7 @@ this example doesn't provide a `crates-token`, so the action won't publish to cr
 [pods]: https://github.com/marhkb/pods
 
 ```yaml
-- uses: cargo-bins/release-rust
+- uses: cargo-bins/release-rust@v1
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     target: ${{ matrix.target }}
