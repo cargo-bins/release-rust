@@ -346,7 +346,61 @@ few extra flags, we can instruct the compiler to remove all panic messages from 
 
 ### Universal binaries on macOS
 
-(use release-lipo action to combine binaries post-release)
+A macOS concept is [universal binaries], which contain code for multiple architectures. This action
+cannot build these directly, but the companion [release-lipo] action will read from an existing
+release, download `*-apple-darwin` packages and extract them, combine the binaries with [`lipo`],
+then repackage and upload the result:
+
+[universal binaries]: https://developer.apple.com/documentation/apple-silicon/building-a-universal-macos-binary
+[release-lipo]: https://github.com/cargo-bins/release-lipo
+[`lipo`]: https://ss64.com/osx/lipo.html
+
+```yaml
+name: Release on tag push
+on:
+  push:
+    tag: v*.*.*
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - { o: macos-latest,    t: x86_64-apple-darwin        }
+        - { o: macos-latest,    t: aarch64-apple-darwin       }
+        - { o: ubuntu-latest,   t: x86_64-unknown-linux-musl  }
+        - { o: ubuntu-latest,   t: aarch64-unknown-linux-musl }
+        - { o: windows-latest,  t: x86_64-pc-windows-msvc     }
+        - { o: windows-latest,  t: aarch64-pc-windows-msvc    }
+
+    name: ${{ matrix.t }}
+    runs-on: ${{ matrix.o }}
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cargo-bins/release-rust@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        crates-token: ${{ secrets.CRATES_TOKEN }}
+        target: ${{ matrix.t }}
+        publish-tag: false
+
+  lipo:
+    needs: release
+    runs-on: macos-latest
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+    - uses: cargo-bins/release-lipo@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+```
 
 ### Multiple crates with globs
 
