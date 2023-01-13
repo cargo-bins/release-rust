@@ -18,7 +18,7 @@ This action is your one-stop shop for building and publishing a Rust project. It
 - Publish the crate to crates.io
 - Publish the archives to GitHub Releases
 
-Sounds complicated? Fear not! In most cases, using this action is the job of a few lines of YAML.
+Sounds complicated? Fear not! In most cases, using this action is the job of only few lines of YAML.
 
 It can be used standalone, as part of your own release workflow, or alongside our own [release-pr]
 and [release-meta] actions. See the `onrelease` workflow in the test repo for [a complete example]
