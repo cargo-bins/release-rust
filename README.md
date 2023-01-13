@@ -279,9 +279,30 @@ manually as well.
     custom-build: just package
 ```
 
-### Custom build: bazel
+### Custom build: meson
 
-(TODO: pick a project using bazel or make or whatever and write it a config)
+Here's a hypothetical configuration for [a project][pods] which uses [meson] to build. The [post-setup hook](#hooks) is
+used to install meson, and the project's dependencies. Finally, the `package-files` option is used to gather the build
+outputs to package, as the meson build won't have put anything in the places the action expects to find them. Note that
+this example doesn't provide a `crates-token`, so the action won't publish to crates.io.
+
+[meson]: https://mesonbuild.com
+[pods]: https://github.com/marhkb/pods
+
+```yaml
+- uses: cargo-bins/release-rust
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    target: ${{ matrix.target }}
+    post-setup: |
+      sudo apt install -y meson ninja appstream-glib glib2 gtk4 libadwaita libpanel gtksourceview vte-2.91-gtk4
+      meson _build --prefix=/usr/local
+    custom-build: ninja -C _build
+    package-files: |
+      _build/src/pods
+      _build/po
+      _build/data/*
+```
 
 ### Compile out panic messages
 
