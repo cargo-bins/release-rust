@@ -483,7 +483,7 @@ jobs:
         publish-crate: false
 ```
 
-(TODO: dependent job before/after the action, disable publish-crate)
+You should take note of [the particular behaviour of the `publish-crate-only` option](#cratesio-publish-only-mode).
 
 ### Extra signing attestations
 
