@@ -36,9 +36,9 @@ of the latter.
 ```yaml
 - uses: cargo-bins/release-rust@v1
   with:
-   github-token: ${{ secrets.GITHUB_TOKEN }}
-   crates-token: ${{ secrets.CRATES_TOKEN }}
-   target: ${{ matrix.target }}
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
 ```
 
 The action needs no dependencies and runs on all hosted-spec runners (or compatible).
@@ -196,9 +196,9 @@ jobs:
     - uses: actions/checkout@v3
     - uses: cargo-bins/release-rust@v1
       with:
-       github-token: ${{ secrets.GITHUB_TOKEN }}
-       crates-token: ${{ secrets.CRATES_TOKEN }}
-       target: ${{ matrix.t }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        crates-token: ${{ secrets.CRATES_TOKEN }}
+        target: ${{ matrix.t }}
 ```
 
 ### Running on tags
@@ -231,10 +231,10 @@ jobs:
     - uses: actions/checkout@v3
     - uses: cargo-bins/release-rust@v1
       with:
-       github-token: ${{ secrets.GITHUB_TOKEN }}
-       crates-token: ${{ secrets.CRATES_TOKEN }}
-       target: ${{ matrix.t }}
-       publish-tag: false
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        crates-token: ${{ secrets.CRATES_TOKEN }}
+        target: ${{ matrix.t }}
+        publish-tag: false
 ```
 
 ### Installing compile-time dependencies
