@@ -13,7 +13,7 @@ This action is your one-stop shop for building and publishing a Rust project. It
   + static linking of libgcc for musl builds (`-C link-arg=-static-libgcc`),
   + outputting split debuginfo (`-C split-debuginfo=packed`).
 - Package binaries and support files in an archive
-- Sign the archive with [sigstore]
+- Sign the archive with [sigstore]'s [cosign]
 - Tag the release if it isn't already, and sign the tag with sigstore
 - Publish the crate to crates.io
 - Publish the archives to GitHub Releases
@@ -30,6 +30,7 @@ of the latter.
 [cargo-binstall]: https://github.com/cargo-bins/cargo-binstall
 [cross]: https://github.com/cross-rs/cross
 [sigstore]: https://sigstore.dev
+[cosign]: https://github.com/sigstore/cosign
 
 ## Usage
 
@@ -53,7 +54,8 @@ The action needs no dependencies and runs on all hosted-spec runners (or compati
 | __🧰 Setup options__ |||
 | `toolchain` | `'nightly'` | The rustup toolchain to use. |
 | `target` | _host target_ | The target to install and build for. |
-| `cosign-version` | _latest 1.x_ | Specify the cosign tool version to use. |
+| `cosign-version` | _latest 1.x_ | Specify the [cosign] version to use. |
+| `binstall-version` | _latest_ | Specify the [cargo-binstall] version to use. |
 | __✂️ Function switches__ |||
 | `publish-crate` | `true` | Set to `false` to disable publishing to crates.io. |
 | `publish-release` | `true` | Set to `false` to disable publishing a GitHub release. Packages will be left in the `packages/` directory. |
