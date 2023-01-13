@@ -308,7 +308,21 @@ this example doesn't provide a `crates-token`, so the action won't publish to cr
 
 ### Compile out panic messages
 
-(use extra flags to set build-std=abort etc)
+While this is not an optimisation that is on by default, it can be useful to reduce the size of binaries. By passing a
+few extra flags, we can instruct the compiler to remove all panic messages from the binary. This is done by forcing
+`panic = "abort"` in the release profile and enabling immediate-abort-on-panic for `build-std`:
+
+```yaml
+- uses: cargo-bins/release-rust@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    extra-cargo-flags: |
+      --config='profile.release.panic="abort"'
+      -Z build-std=std,panic_abort
+      -Z build-std-features=panic_immediate_abort
+```
 
 ### Universal binaries on macOS
 
