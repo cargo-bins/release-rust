@@ -31,35 +31,11 @@ of the latter.
 ## Usage
 
 ```yaml
-name: Release build
-on:
-  pull_request:
-    types: closed
-    branches: [main] # target branch of release PRs
-
-jobs:
-  release:
-    if: github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'release')
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - { o: macos-latest,    t: x86_64-apple-darwin        }
-        - { o: macos-latest,    t: aarch64-apple-darwin       }
-        - { o: ubuntu-latest,   t: x86_64-unknown-linux-musl  }
-        - { o: ubuntu-latest,   t: aarch64-unknown-linux-musl }
-        - { o: windows-latest,  t: x86_64-pc-windows-msvc     }
-        - { o: windows-latest,  t: aarch64-pc-windows-msvc    }
-
-    name: ${{ matrix.t }}
-    runs-on: ${{ matrix.o }}
-    steps:
-    - uses: actions/checkout@v3
-    - uses: cargo-bins/release-rust
-      with:
-       github-token: ${{ secrets.GITHUB_TOKEN }}
-       crates-token: ${{ secrets.CRATES_TOKEN }}
-       target: ${{ matrix.t }}
+- uses: cargo-bins/release-rust
+  with:
+   github-token: ${{ secrets.GITHUB_TOKEN }}
+   crates-token: ${{ secrets.CRATES_TOKEN }}
+   target: ${{ matrix.target }}
 ```
 
 The action needs no dependencies and runs on all hosted-spec runners (or compatible).
@@ -182,9 +158,80 @@ All outputs of a Github Action are strings.
 
 ### Basic usage
 
+This example runs when pull requests tagged with a `release` label are merged to the `main` branch.
+
+It builds the project for six targets (x64 and ARM64 for the big three platforms) and otherwise uses
+all defaults: compiles with `build-std`, packs the debuginfo, uses zip archives, publishes to crates.io,
+pushes a tag, publishes to GitHub releases, and uploads signatures to sigstore. The binaries can then
+be securely installed with [`cargo binstall`][cargo-binstall].
+
+```yaml
+name: Release on PR merge
+on:
+  pull_request:
+    types: closed
+    branches: [main] # target branch of release PRs
+
+jobs:
+  release:
+    if: github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'release')
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - { o: macos-latest,    t: x86_64-apple-darwin        }
+        - { o: macos-latest,    t: aarch64-apple-darwin       }
+        - { o: ubuntu-latest,   t: x86_64-unknown-linux-musl  }
+        - { o: ubuntu-latest,   t: aarch64-unknown-linux-musl }
+        - { o: windows-latest,  t: x86_64-pc-windows-msvc     }
+        - { o: windows-latest,  t: aarch64-pc-windows-msvc    }
+
+    name: ${{ matrix.t }}
+    runs-on: ${{ matrix.o }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cargo-bins/release-rust
+      with:
+       github-token: ${{ secrets.GITHUB_TOKEN }}
+       crates-token: ${{ secrets.CRATES_TOKEN }}
+       target: ${{ matrix.t }}
+```
+
 ### Running on tags
 
-(disable tagging)
+This example runs when a version tag is pushed. While the action would detect the tag exists before pushing it,
+we disable tag publishing to save a little time. Otherwise it does everything the above example does.
+
+```yaml
+name: Release on tag push
+on:
+  push:
+    tag: v*.*.*
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - { o: macos-latest,    t: x86_64-apple-darwin        }
+        - { o: macos-latest,    t: aarch64-apple-darwin       }
+        - { o: ubuntu-latest,   t: x86_64-unknown-linux-musl  }
+        - { o: ubuntu-latest,   t: aarch64-unknown-linux-musl }
+        - { o: windows-latest,  t: x86_64-pc-windows-msvc     }
+        - { o: windows-latest,  t: aarch64-pc-windows-msvc    }
+
+    name: ${{ matrix.t }}
+    runs-on: ${{ matrix.o }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cargo-bins/release-rust
+      with:
+       github-token: ${{ secrets.GITHUB_TOKEN }}
+       crates-token: ${{ secrets.CRATES_TOKEN }}
+       target: ${{ matrix.t }}
+       publish-tag: false
+```
 
 ### Installing compile-time dependencies
 
