@@ -182,10 +182,10 @@ as the toolchain setup can then be easily kept consistent between the two jobs.
 
 In that mode:
 - The toolchain setup is performed, but without any default components.
-- The `post-setup` hook is run, if set.
-- The crate is immediately published to crates.io.
+- The `post-setup` and `post-publish` hooks are run, if set.
 - Everything else is skipped: other hooks, the build, packaging, tagging, the release, etc.
-- The action will fail if the crate is already published at that version (in normal mode, such failures are ignored).
+- The action will fail if the crate is already published at that version (in normal mode, such
+  failures are ignored).
 
 If you want to _only_ publish to crates.io and _not_ then package the binaries, you should not use
 this action, and do something like this instead:
@@ -205,9 +205,9 @@ this action, and do something like this instead:
 This example runs when pull requests tagged with a `release` label are merged to the `main` branch.
 
 It builds the project for six targets (x64 and ARM64 for the big three platforms) and otherwise uses
-all defaults: compiles with `build-std`, packs the debuginfo, uses zip archives, publishes to crates.io,
-pushes a tag, publishes to GitHub releases, and uploads signatures to sigstore. The binaries can then
-be securely installed with [`cargo binstall`][cargo-binstall].
+all defaults: compiles with `build-std`, packs the debuginfo, uses zip archives, publishes to
+crates.io, pushes a tag, publishes to GitHub releases, and uploads signatures to sigstore. The
+binaries can then be securely installed with [`cargo binstall`][cargo-binstall].
 
 ```yaml
 name: Release on PR merge
@@ -247,8 +247,9 @@ jobs:
 
 ### Running on tags
 
-This example runs when a version tag is pushed. While the action would detect the tag exists before pushing it,
-we disable tag publishing to save a little time. Otherwise it does everything the above example does.
+This example runs when a version tag is pushed. While the action would detect the tag exists before
+pushing it, we disable tag publishing to save a little time. Otherwise it does everything the above
+example does.
 
 ```yaml
 name: Release on tag push
@@ -287,10 +288,11 @@ jobs:
 
 ### Installing compile-time dependencies
 
-Here we build a project that requires [compiler-rt] (provided in Ubuntu by `libblocksruntime-dev`), but only for the
-`x86_64-unknown-linux-musl` target. The [post-setup hook](#hooks) is used to install the dependency after the action
-finishes setting up the build environment.
+Here we build a project that requires [compiler-rt] (provided in Ubuntu by `libblocksruntime-dev`),
+but only for the `x86_64-unknown-linux-musl` target. The [post-setup hook] is used to install the
+dependency after the action finishes setting up the build environment.
 
+[post-setup hook]: #hooks
 [compiler-rt]: https://compiler-rt.llvm.org
 
 ```yaml
@@ -307,10 +309,10 @@ finishes setting up the build environment.
 
 ### Custom build: justfile
 
-Here we have [a project][cargo-binstall] that uses [just] to build the project. The [post-setup hook](#hooks) is also
-used here to install the `just` CLI tool: it does so using [cargo-binstall] which is installed by the action as part of
-setup. Because `custom-build` is used, the action won't install the `rust-src` component by default, so we add it
-manually as well.
+Here we have [a project][cargo-binstall] that uses [just] to build the project. A [post-setup hook]
+is also used here to install the `just` CLI tool: it does so using [cargo-binstall] which is
+installed by the action as part of setup. Because `custom-build` is used, the action won't install
+the `rust-src` component by default, so we add it manually as well.
 
 [just]: https://just.systems
 
@@ -329,10 +331,11 @@ manually as well.
 
 ### Custom build: meson
 
-Here's a hypothetical configuration for [a project][pods] which uses [meson] to build. The [post-setup hook](#hooks) is
-used to install meson, and the project's dependencies. Finally, the `package-files` option is used to gather the build
-outputs to package, as the meson build won't have put anything in the places the action expects to find them. Note that
-this example doesn't provide a `crates-token`, so the action won't publish to crates.io.
+Here's a hypothetical configuration for [a project][pods] which uses [meson] to build. A
+[post-setup hook] is used to install meson, and the project's dependencies. Finally, the
+`package-files` option is used to gather the build outputs to package, as the meson build won't have
+put anything in the places the action expects to find them. Note that this example doesn't provide a
+`crates-token`, so the action won't publish to crates.io.
 
 [meson]: https://mesonbuild.com
 [pods]: https://github.com/marhkb/pods
@@ -354,9 +357,10 @@ this example doesn't provide a `crates-token`, so the action won't publish to cr
 
 ### Compile out panic messages
 
-While this is not an optimisation that is on by default, it can be useful to reduce the size of binaries. By passing a
-few extra flags, we can instruct the compiler to remove all panic messages from the binary. This is done by forcing
-`panic = "abort"` in the release profile and enabling immediate-abort-on-panic for `build-std`:
+While this is not an optimisation that is on by default, it can be useful to reduce the size of
+binaries. By passing a few extra flags, we can instruct the compiler to remove all panic messages
+from the binary. This is done by forcing `panic = "abort"` in the release profile and enabling the
+immediate-abort-on-panic feature for `build-std`:
 
 ```yaml
 - uses: cargo-bins/release-rust@v1
