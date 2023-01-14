@@ -705,6 +705,7 @@ _The `post-setup` hook is run._
   + Otherwise, the crate is kept in the list.
 - Crates from that list that are publishable are published to the `publish-registry`.
   + if `publish-crate-only` is `true` and the list is empty, the action fails.
+- _The `post-publish` hook is run._
 - If `publish-crate-only` is true, the action stops here.
 
 ### Build phase
