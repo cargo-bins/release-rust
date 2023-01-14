@@ -708,7 +708,15 @@ _The `post-setup` hook is run._
 ### Build phase
 
 - _If `custom-build` is set, it is called._
-- Otherwise, the build command is assembled from various inputs and defaults, then called.
+- Otherwise, the build command is assembled and called.
+  + if `use-cross` is `true`, the `cross` command is used instead of `cargo`.
+  + the `--release` cargo profile is used.
+  + the `--target` cargo option is set to the `target` input.
+  + if `buildstd` is `true`, flags to build std as part of compilation are added to cargo.
+  + if `debuginfo` is `true` (and `buildstd` is not `false`), flags to produce packed split debuginfo are added to cargo.
+  + if `musl-libgcc` is `true`, flags to statically link `libgcc` are added to RUSTFLAGS iff the target's libc variant is musl.
+  + the `extra-cargo-flags` input is stripped of newlines and appended to cargo.
+  + the `extra-rustc-flags` input is stripped of newlines and appended to RUSTFLAGS.
 - _The `post-build` hook is run._
 
 ### Package phase
