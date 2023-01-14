@@ -480,7 +480,6 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `publish-crate` | `true` | Set to `false` to disable publishing to crates.io. |
 | `publish-crate-only` | `false` | Set to `true` to _only_ publish to crates.io. See [Crates.io publish only mode](#cratesio-publish-only-mode) for how this affects hooks. |
 | `publish-all-crates` | `false` | Set to `true` to publish to crates.io all crates [that need it](#publish-all-crates). |
-| `publish-registry` | _optional_ | Registry to publish to. This overrides the `Cargo.toml` configuration. |
 | __🎫 Tags__ |||
 | `tag` | _version_ | Tag to create or use for the release. Set to `false` to disable tagging. This will imply `release: false`. |
 | `tag-crates` | `true` | Set to `false` to disable tagging crate publishes. |
@@ -494,7 +493,7 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `release-pre` | `false` | Set to `true` to mark the release as a pre-release, or to a newline-separated pattern list of crates to mark so. |
 | __🪝 Hooks__ |||
 | `post-setup` | _optional_ | Script to run after toolchain setup. |
-| `post-publish` | _optional_ | Script to run after publishing to crates.io. |
+| `post-publish` | _optional_ | Script to run after publishing to registry. |
 | `custom-build` | _optional_ | Completely [custom build script](#custom-build). Compilation options and extra cargo/rustc flags will be ignored if this is set. |
 | `post-build` | _optional_ | Script to run after building. |
 | `pre-package` | _optional_ | Script to run immediately before packaging. |
@@ -725,13 +724,13 @@ _The `post-setup` hook is run._
 - The action looks up the name of every crate in the workspace.
 - The `crates` input is evaluated as a list of globs, and matched against this list. The result is
   the list of crates to package and release.
-- The action queries the `publish-registry` for the versions of each crate from that list (or from
-  the list of all crates if `publish-all-crates` is `true`) and compares them to the local version.
+- The action queries the registry for the versions of each crate from that list (or from the list of
+  all crates if `publish-all-crates` is `true`) and compares them to the local version.
   + If the local version is already published, and:
     * `release-separately` is `true`: the crate is removed from the list of crates.
     * `release-separately` is `false`: the crate is removed only from the list of crates to publish.
   + Otherwise, the crate is kept in the list.
-- Crates from that list that are publishable are published to the `publish-registry`.
+- Crates from that list that are publishable are published to the registry.
   + if `publish-crate-only` is `true` and the list is empty, the action fails.
 - _The `post-publish` hook is run._
 - If `publish-crate-only` is true, the action stops here.
