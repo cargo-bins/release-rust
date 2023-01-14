@@ -461,7 +461,7 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `buildstd` | _see [Build-std](#build-std)_ | Set to `false` to disable building the standard library from source. |
 | `debuginfo` | _see [Split debuginfo](#debuginfo)_ | Set to `false` to disable generating and outputting split debuginfo. |
 | `musl-libgcc` | `true` | Set to `false` to disable static-linking libgcc for musl builds. |
-| `use-cross` | `'auto'` | Force use/non-use of cross to compile. By default, will use cross if the target is not the host target. |
+| `use-cross` | _see [Build phase](#build-phase)_ | Force use/non-use of cross to compile. By default, will use cross if the target is not the host target. |
 | __🚩 Extra flags__ |||
 | `extra-rustup-components` | _optional_ | Extra components to install with rustup. |
 | `extra-cargo-flags` | _optional_ | Extra flags to pass to cargo build. |
@@ -736,6 +736,14 @@ _The `post-setup` hook is run._
 - If `publish-crate-only` is true, the action stops here.
 
 ### Build phase
+
+The value of `use-cross` is determined as follows, in this order:
+  - if it is provided as input, that value is used;
+  - if the `target` input is the host target, it is `false`;
+  - if the `target` input is in [a hardcoded list of cross targets][cross-targets], it is `true`;
+  - otherwise, it is `false`.
+
+[cross-targets]: ./src/targets/cross.ts
 
 - _If `custom-build` is set, it is called._
 - Otherwise, the build command is assembled and called.
