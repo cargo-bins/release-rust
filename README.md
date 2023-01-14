@@ -489,7 +489,7 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `release-notes` | _optional_ | Body of the github release. |
 | `release-name` | _version_ | Name of the github release. |
 | `release-separately` | `false` | Create a release for each crate. |
-| `release-latest` | _see [Release phase](#release-phase)_ | Set to `true` to mark the release as the latest, or to a crate name to mark so if `release-separately` is `true`. |
+| `release-latest` | _see [Release phase](#release-phase)_ | Set to `false` to not mark the release as the latest, or to a crate name to mark as latest if `release-separately` is `true`. |
 | `release-pre` | `false` | Set to `true` to mark the release as a pre-release, or to a newline-separated pattern list of crates to mark so. |
 | __🪝 Hooks__ |||
 | `post-setup` | _optional_ | Script to run after toolchain setup. |
@@ -817,7 +817,7 @@ If `release` is not `false`, and:
   + A release is created with the tag created in the previous phase:
     * its name as the `release-name` result;
     * its body as the `release-body` input;
-    * marked as latest if `release-latest` is `true` or equal to the `release-name`;
+    * marked as latest if `release-latest` is equal to the `release-name` or not `false`;
     * marked as pre-release if `release-pre` is `true` or matching the `release-name`.
 - otherwise, for each tag created in the previous phase:
   + Each of the `release-name` and `release-body` inputs:
@@ -829,7 +829,7 @@ If `release` is not `false`, and:
   + A release is created with the tag:
     * its name as the `release-name` result;
     * its body as the `release-body` input;
-    * marked as latest if `release-latest` is `true` or equal to the `release-name`;
+    * marked as latest if `release-latest` is equal to the `release-name` or not `false`;
     * marked as pre-release if `release-pre` is `true` or matching the `release-name`.
 
 _The `post-release` hook is run (only once)._
