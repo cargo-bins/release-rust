@@ -22,8 +22,6 @@ It can be used standalone, as part of your own release workflow, or alongside ou
 and [release-meta] actions. See the `onrelease` workflow in the test repo for [a complete example]
 of the latter.
 
-Sounds complicated? Fear not! In most cases, using this action is the job of only few lines of YAML:
-
 [release-pr]: https://github.com/cargo-bins/release-pr
 [release-meta]: https://github.com/cargo-bins/release-meta
 [a complete example]: https://github.com/passcod/cargo-release-pr-test/blob/main/.github/workflows/onrelease.yml
@@ -32,7 +30,7 @@ Sounds complicated? Fear not! In most cases, using this action is the job of onl
 [sigstore]: https://sigstore.dev
 [cosign]: https://github.com/sigstore/cosign
 
-## Usage
+Sounds complicated? Fear not! In most cases, using this action is the job of only few lines of YAML:
 
 ```yaml
 permissions:
@@ -47,8 +45,6 @@ steps:
     crates-token: ${{ secrets.CRATES_TOKEN }}
     target: ${{ matrix.target }}
 ```
-
-The action needs no dependencies and runs on all hosted-spec runners (or compatible).
 
 - **[Examples](#examples)**
   + [Basic usage](#basic-usage)
@@ -496,6 +492,8 @@ You should take note of [the particular behaviour of the `publish-crate-only` op
 | `post-sign` | _optional_ | Script to run after signing. |
 | `post-release` | _optional_ | Script to run after releasing to Github. |
 | `hooks-shell` | `'bash'` | Shell to use for all hooks. |
+
+The action needs no dependencies and runs on all hosted-spec runners (or compatible).
 
 ### Github token permissions
 
