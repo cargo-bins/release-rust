@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+
 import {getInput} from '@actions/core';
 import {array, boolean, object, string} from 'yup';
 
@@ -42,7 +44,7 @@ export interface Package {
 export type ArchiveFormat = 'none' | 'zip' | 'tar+gzip' | 'tar-bzip2' | 'tar+xz' | `tar+zstd`;
 
 export async function getPackage(): Promise<Package> {
-	return await SCHEMA.validate({
+	const inputs = await SCHEMA.validate({
 		archive: getInput('package-archive'),
 		files: getInput('package-files'),
 		name: getInput('package-name'),
@@ -52,4 +54,9 @@ export async function getPackage(): Promise<Package> {
 		output: getInput('package-output'),
 		sign: getInput('package-sign')
 	});
+
+	return {
+		...inputs,
+		output: join(process.cwd(), inputs.output),
+	};
 }

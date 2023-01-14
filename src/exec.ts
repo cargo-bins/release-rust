@@ -23,7 +23,7 @@ export async function execAndSucceed(
 export async function runHook(
 	inputs: InputsType,
 	name: string,
-	env: {[key: string]: string} = {},
+	environment: {[key: string]: string} = {},
 	workdir: string = process.cwd()
 ): Promise<void> {
 	let hook;
@@ -61,6 +61,14 @@ export async function runHook(
 		return;
 	}
 
+	const env = {
+		...process.env,
+		RELEASE_ROOT: process.cwd(), // TODO: actually compute workspace root?
+		RELEASE_PACKAGE_OUTPUT: inputs.package.output,
+		RELEASE_TARGET: inputs.setup.target,
+		...environment,
+	};
+
 	debug('Creating temporary directory for hook script');
 	const dir = await mkdtemp(join(tmpdir(), `${name}-`));
 
@@ -84,6 +92,9 @@ export async function runHook(
 	} else {
 		const [prog, ...shellArgs] = inputs.hooks.shell.split(' ');
 		if (ext === 'ps1') shellArgs.push('-file');
-		await execAndSucceed(prog, [...shellArgs, `${path}`]);
+		await execAndSucceed(prog, [...shellArgs, `${path}`], {
+			cwd: workdir,
+			env
+		});
 	}
 }
