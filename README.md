@@ -447,7 +447,7 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | Name | Default | Description |
 |:-|:-:|:-|
 | __🔑 Credentials__ |||
-| `github-token` | **required** | A github token to interact with the API and to use for OIDC claims. |
+| `github-token` | **required** | A github token to interact with the API and to use for OIDC. |
 | `crates-token` | _optional_ | A crates.io token with publish scope for the crate(s). If not provided, crates will not be published. |
 | __🧰 Setup options__ |||
 | `toolchain` | `'nightly'` | The rust toolchain to use. |
@@ -456,12 +456,12 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `cosign-version` | _latest 1.x_ | Specify the [cosign] version to use (1.13.0 and above). |
 | `cross-version` | _latest_ | Specify the [cross] version to use (0.2.0 and above). |
 | __⚒️ Compilation options__ |||
-| `crates` | _all crates_ | Newline-separated list of crate globs to build within the workspace. |
+| `crates` | _all crates_ | Newline-separated pattern list of crates to build within the workspace. |
 | `features` | _optional_ | Newline-separated features to enable when building. |
 | `buildstd` | _see [Build-std](#build-std)_ | Set to `false` to disable building the standard library from source. |
 | `debuginfo` | _see [Split debuginfo](#debuginfo)_ | Set to `false` to disable generating and outputting split debuginfo. |
 | `musl-libgcc` | `true` | Set to `false` to disable static-linking libgcc for musl builds. |
-| `use-cross` | `'auto'` | Force use of cross to compile. By default, will use cross if the target is not the host target. |
+| `use-cross` | `'auto'` | Force use/non-use of cross to compile. By default, will use cross if the target is not the host target. |
 | __🚩 Extra flags__ |||
 | `extra-rustup-components` | _optional_ | Extra components to install with rustup. |
 | `extra-cargo-flags` | _optional_ | Extra flags to pass to cargo build. |
@@ -469,7 +469,7 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `extra-cosign-flags` | _optional_ | Extra flags to pass to cosign. |
 | __🥡 Packaging__ |||
 | `package-archive` | `'zip'` | [Packaging archive format](#packaging). |
-| `package-files` | _optional_ | Newline-separated list of file globs to include in the package in addition to compiled binaries. |
+| `package-files` | _optional_ | Newline-separated pattern list of files to include in the package in addition to compiled binaries. |
 | `package-name` | _see [Packaging](#packaging) and [`package-separately`](#package-separately)_ | Name of the package, excluding the extension. |
 | `package-in-dir` | `true` | Wrap the package contents in a directory with the same name before archiving. |
 | `package-separately` | `false` | Package each crate separately. |
@@ -538,7 +538,7 @@ smaller or better-optimized binaries, but it's not always available, desired, or
 
 This action uses `build-std` by default **if**:
 - the `toolchain` selected is the latest nightly, or a dated nightly after `2020-01-01`, _and_
-- the `target` is one of a [hardcoded list of targets](./src/build-std-targets.ts), _and_
+- the `target` is one of a [hardcoded list of targets](./src/targets/build-std.ts), _and_
 - the `buildstd` input is not set to `false`.
 
 ## Debuginfo
