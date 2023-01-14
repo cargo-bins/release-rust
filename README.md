@@ -470,7 +470,7 @@ You should take note of [the particular behaviour of the `publish-crate-only` op
 | __🥡 Packaging__ |||
 | `package-archive` | `'zip'` | [Packaging archive format](#packaging). |
 | `package-files` | _optional_ | Newline-separated list of file globs to include in the package in addition to compiled binaries. |
-| `package-name` | `'{crate}-{target}-{version}'` | Name of the package, excluding the extension. |
+| `package-name` | `'{crate-name}-{target}-{crate-version}'` | Name of the package, excluding the extension. |
 | `package-in-dir` | `true` | Wrap the package contents in a directory with the same name before archiving. |
 | `package-separately` | `false` | Package each crate separately. |
 | `package-short-ext` | `false` | Use the short variant of the archive extension, if relevant for the format. E.g. `tgz` instead of `tar.gz`. |
