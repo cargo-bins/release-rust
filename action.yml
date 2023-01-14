@@ -28,22 +28,24 @@ inputs:
   cross-version:
     description: Specify the cross version to use.
 
-  # compilation
+  # build
   crates:
     description: Newline-separated pattern list of crates to build within the workspace.
   features:
     description: Newline-separated features to enable when building.
   buildstd:
     description: Set to `false` to disable building the standard library from source.
+    default: 'true'
   debuginfo:
     description: Set to `false` to disable generating and outputting split debuginfo.
+    default: 'true'
   musl-libgcc:
     description: Set to `false` to disable static-linking libgcc for musl builds.
     default: 'true'
   use-cross:
     description: Force use/non-use of cross to compile.
 
-  # extra flags
+  # extras
   extra-rustup-components:
     description: Extra components to install with rustup.
   extra-cargo-flags:
@@ -77,7 +79,7 @@ inputs:
     description: Set to `false` to disable signing packages.
     default: 'true'
 
-  # crate publishing
+  # publishing
   publish-crate:
     description: Set to `false` to disable publishing to crates.io.
     default: 'true'
@@ -102,10 +104,10 @@ inputs:
   release:
     description: Set to `false` to disable publishing a GitHub release.
     default: 'true'
-  release-notes:
-    description: Body of the github release.
   release-name:
     description: Name of the github release.
+  release-notes:
+    description: Body of the github release.
   release-separately:
     description: Create a release for each crate.
     default: 'false'

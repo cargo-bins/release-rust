@@ -455,7 +455,7 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `binstall-version` | _latest_ | Specify the [cargo-binstall] version to use (0.20.0 and above). |
 | `cosign-version` | _latest 1.x_ | Specify the [cosign] version to use (1.13.0 and above). |
 | `cross-version` | _latest_ | Specify the [cross] version to use (0.2.0 and above). |
-| __⚒️ Compilation options__ |||
+| __⚒️ Build options__ |||
 | `crates` | _all crates_ | Newline-separated pattern list of crates to build within the workspace. |
 | `features` | _optional_ | Newline-separated features to enable when building. |
 | `buildstd` | _see [Build-std](#build-std)_ | Set to `false` to disable building the standard library from source. |
@@ -486,8 +486,8 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `tag-sign` | `true` | Set to `false` to disable signing tags (with sigstore by default). |
 | __🚢 Github release__ |||
 | `release` | `true` | Set to `false` to disable publishing a GitHub release. Packages will be left in the `packages/` directory. |
-| `release-notes` | _optional_ | Body of the github release. |
 | `release-name` | _version_ | Name of the github release. |
+| `release-notes` | _optional_ | Body of the github release. |
 | `release-separately` | `false` | Create a release for each crate. |
 | `release-latest` | _see [Release phase](#release-phase)_ | Set to `false` to not mark the release as the latest, or to a crate name to mark as latest if `release-separately` is `true`. |
 | `release-pre` | `false` | Set to `true` to mark the release as a pre-release, or to a newline-separated pattern list of crates to mark so. |
@@ -544,7 +544,7 @@ smaller or better-optimized binaries, but it's not always available, desired, or
 
 [`build-std` feature]: https://doc.rust-lang.org/cargo/reference/unstable.html#build-std
 
-This action uses `build-std` by default **if**:
+This action uses `build-std` **if**:
 - the `toolchain` selected is the latest nightly, or a dated nightly after `2020-01-01`, _and_
 - the `target` is one of a [hardcoded list of targets](./src/targets/build-std.ts), _and_
 - the `buildstd` input is not set to `false`.
@@ -558,7 +558,7 @@ which is handy for packaging and distributing!
 
 [`split-debuginfo` feature]: https://doc.rust-lang.org/rustc/codegen-options/index.html#split-debuginfo
 
-This action uses `split-debuginfo` by default **if**:
+This action uses `split-debuginfo` **if**:
 - the `toolchain` selected is the latest `stable` or `nightly`, a [stable >=1.65.0][stable-linux-d],
   or a dated nightly after `2022-09-01`, _and_
 - the `debuginfo` input is not set to `false`.
