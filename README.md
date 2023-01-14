@@ -167,7 +167,7 @@ Here we build a project that requires [compiler-rt] (provided in Ubuntu by `libb
 but only for the `x86_64-unknown-linux-musl` target. The [post-setup hook] is used to install the
 dependency after the action finishes setting up the build environment.
 
-[post-setup hook]: #hooks
+[post-setup hook]: #setup-phase
 [compiler-rt]: https://compiler-rt.llvm.org
 
 ```yaml
@@ -360,7 +360,7 @@ Notably, you may want to set the first crate in the list explicitly as it may af
 By default, all binaries in the workspace, or in the set of `crates` being built, will be packaged.
 To filter these, use the [`pre-package` hook] to run a script that will remove unwanted binaries:
 
-[`pre-package` hook]: #hooks
+[`pre-package` hook]: #package-phase
 
 ```yaml
 - uses: cargo-bins/release-rust@v1
@@ -572,7 +572,7 @@ maximum compression setting is used.
 
 | Value | Description |
 |:-:|:-|
-| `none` | Do not archive the package. This is an advanced option, and you should use [package hooks](#hooks) alongside it, otherwise you may not have anything to upload. |
+| `none` | Do not archive the package. This is an advanced option, and you should use [package hooks](#package-phase) alongside it, otherwise you may not have anything to upload. |
 | `zip` | ZIP archive, with DEFLATE compression. This is the default, as it has the widest compatibility. |
 | `tar+gzip` | Posix (pax) TAR archive, with GZIP compression. |
 | `tar+bzip2` | Posix (pax) TAR archive, with BZIP2 compression. |
