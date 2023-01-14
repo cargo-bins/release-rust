@@ -490,6 +490,8 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `release-notes` | _optional_ | Body of the github release. |
 | `release-name` | _version_ | Name of the github release. |
 | `release-separately` | `false` | Create a release for each crate. |
+| `release-latest` | _see [Release phase](#release-phase)_ | Set to `true` to mark the release as the latest, or to a crate name to mark so if `release-separately` is `true`. |
+| `release-pre` | `false` | Set to `true` to mark the release as a pre-release, or to a newline-separated pattern list of crates to mark so. |
 | __🪝 Hooks__ |||
 | `post-setup` | _optional_ | Script to run after toolchain setup. |
 | `post-publish` | _optional_ | Script to run after publishing to crates.io. |
@@ -656,7 +658,7 @@ TODO: add landscape diagram
 A particularity is that hooks run even if their phase's purpose is disabled, so they can be used to
 replace the functionality of a phase without changing the rest of the action.
 
-#### Setup phase
+### Setup phase
 
 All of these are always performed, even if the phase they are used in is disabled: this makes it
 possible to use hooks to replace phases without having to download these tools.
@@ -744,6 +746,28 @@ _The `post-package` hook is run (only once)._
 
 ### Release phase
 
+If `release` is not `false`, and:
+- `release-separately` is `false`:
+  + The `release-name` input is evaluated as a template (same placeholders as [`package-name`](#packaging)).
+  + A release is created with the tag created in the previous phase:
+    * its name as the `release-name` result;
+    * its body as the `release-body` input;
+    * marked as latest if `release-latest` is `true` or equal to the `release-name`;
+    * marked as pre-release if `release-pre` is `true` or matching the `release-name`.
+- otherwise, for each tag created in the previous phase:
+  + Each of the `release-name` and `release-body` inputs:
+    * is attempted to parse as JSON. If it can be, and it is an object, each key is evaluated as a
+      glob pattern against the list of crates, from most precise (proportion of glob characters) to
+      least, and the first match is used. If no match is found, the action fails. If the value is
+      not JSON, this step is skipped.
+    * the value is then evaluated as a template with that crate's `crate-name` and `crate-version`.
+  + A release is created with the tag:
+    * its name as the `release-name` result;
+    * its body as the `release-body` input;
+    * marked as latest if `release-latest` is `true` or equal to the `release-name`;
+    * marked as pre-release if `release-pre` is `true` or matching the `release-name`.
+
+_The `post-release` hook is run (only once)._
 
 ## Hook context
 
