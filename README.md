@@ -740,6 +740,11 @@ _The `post-package` hook is run (only once)._
 
 ### Sign phase
 
+If `package-sign` is `true`, then for each file in the `package-output` directory:
+
+- The file is signed with `cosign sign-blob`, using GitHub's OIDC identity and keyless signing.
+
+_The `post-sign` hook is run (only once)._
 
 ### Tag phase
 
