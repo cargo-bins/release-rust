@@ -579,7 +579,7 @@ release and package, and only publish that one to crates.io.
 That "first" crate is determined by sorting the names of all binary crates in the workspace in
 lexicographic order, and using the first one, or by the first entry in the `crates` input. If the
 first entry in the `crates` input is a glob pattern, the first lexicographic match in its expansion
-will be used.
+will be used. This is also called the `release-name` (e.g. in the `package-name` template).
 
 This behaviour makes it easy to use the action in the common situation of a workspace with a single
 binary crate and multiple library crates it depends on or relates to. For other situations, options
