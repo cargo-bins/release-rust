@@ -14,7 +14,7 @@ This action is your one-stop shop for building and publishing a Rust project. It
   + outputting split debuginfo (`-C split-debuginfo=packed`).
 - Package binaries and support files in an archive
 - Sign the archive with [sigstore]'s [cosign]
-- Tag the release if it isn't already, and sign the tag with sigstore
+- Tag the release if it isn't already, and sign the tag with [gitsign]
 - Publish the crate to crates.io
 - Publish the archives to GitHub Releases
 
@@ -29,6 +29,7 @@ of the latter.
 [cross]: https://github.com/cross-rs/cross
 [sigstore]: https://sigstore.dev
 [cosign]: https://github.com/sigstore/cosign
+[gitsign]: https://github.com/sigstore/gitsign
 
 Sounds complicated? Fear not! In most cases, using this action is the job of only few lines of YAML:
 
@@ -709,7 +710,7 @@ Cosign:
 - Version 1.13.0 is downloaded for the current platform, and checked against
   checksums hardcoded in this action (bootstrap).
 - Cosign is securely self-upgraded to the latest (or desired) version.
-- [Gitsign](https://github.com/sigstore/gitsign) is downloaded, verified, and installed.
+- [gitsign] is downloaded, verified, and installed.
 
 _The `post-setup` hook is run._
 
