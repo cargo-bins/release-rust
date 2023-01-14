@@ -470,7 +470,7 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | __🥡 Packaging__ |||
 | `package-archive` | `'zip'` | [Packaging archive format](#packaging). |
 | `package-files` | _optional_ | Newline-separated list of file globs to include in the package in addition to compiled binaries. |
-| `package-name` | `'{crate-name}-{target}-{crate-version}'` | Name of the package, excluding the extension. |
+| `package-name` | _see [Packaging](#packaging) and [`package-separately`](#package-separately)_ | Name of the package, excluding the extension. |
 | `package-in-dir` | `true` | Wrap the package contents in a directory with the same name before archiving. |
 | `package-separately` | `false` | Package each crate separately. |
 | `package-short-ext` | `false` | Use the short variant of the archive extension, if relevant for the format. E.g. `tgz` instead of `tar.gz`. |
@@ -545,11 +545,11 @@ There's no support to select different formats based on the target: if you wish 
 that logic yourself in the workflow, prior to calling this action.
 
 The `package-name` input is a template string that will be used to name the package, and defaults to
-`{crate-name}-{crate-version}-{target}`. The following placeholders can be used:
+`{release-name}-{target}`. The following placeholders can be used:
 
 - `{target}`: The target being built for.
 - `{crate-name}`: The name of the crate being packaged.
-- `{release-name}`: The name of the release being created.
+- `{release-name}`: The [name of the release](#with-multiple-crates) being created.
 - `{crate-version}`: The version of the crate being packaged.
 - `{release-version}`: The version of the release being created.
 
@@ -598,11 +598,13 @@ will be released, even if no package was generated for it.
 If `tag` or `tag-crate` is false, crates will be published to the registry, but not
 tagged in the repository. Otherwise, a tag will be created for each published crate.
 
-(only concerns crates.io publishing, all crates (or all `crates`) will be built/packaged regardless)
-
 ### `package-separately`
 
-(note how the build is still done in one step, but with `-p` used)
+The action will create a package for each crate's binaries. The `package-name` input changes its
+default to `{crate-name}-{target}`, so that each package has a different name.
+
+By default, all packages will be uploaded to the same release. If `release-separately` is `true`,
+each package will be uploaded to its own release.
 
 ### `release-separately`
 
