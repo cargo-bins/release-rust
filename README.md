@@ -743,6 +743,21 @@ _The `post-package` hook is run (only once)._
 
 ### Tag phase
 
+If `tag` is not `false`, and:
+- `publish-all-crates` and `release-separately` are both `false`:
+  + The `tag` input is evaluated as a template (same placeholders as [`package-name`](#packaging)).
+  + An annotated tag is created at the current commit.
+    * If `tag-sign` is `true`, the tag is signed with [gitsign].
+- otherwise
+  + for each published crate:
+    * The `tag` input is evaluated with `crate-name` and `crate-version` as that crate's.
+    * An annotated tag is created at the current commit (and signed if enabled).
+  + for the release as a whole, if the `release-crate` is not within the set of published crates:
+    * The `tag` input is evaluated as normal.
+    * An annotated tag is created at the current commit (and signed if enabled).
+- All created tags are pushed to the repo.
+
+_The `post-tag` hook is run (only once)._
 
 ### Release phase
 
