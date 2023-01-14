@@ -450,7 +450,7 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `github-token` | **required** | A github token to interact with the API and to use for OIDC claims. |
 | `crates-token` | _optional_ | A crates.io token with publish scope for the crate(s). If not provided, crates will not be published. |
 | __🧰 Setup options__ |||
-| `toolchain` | `'nightly'` | The rustup toolchain to use. |
+| `toolchain` | `'nightly'` | The rust toolchain to use. |
 | `target` | _host target_ | The target to install and build for. |
 | `binstall-version` | _latest_ | Specify the [cargo-binstall] version to use (0.20.0 and above). |
 | `cosign-version` | _latest 1.x_ | Specify the [cosign] version to use (1.13.0 and above). |
@@ -458,8 +458,8 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | __⚒️ Compilation options__ |||
 | `crates` | _all crates_ | Newline-separated list of crate globs to build within the workspace. |
 | `features` | _optional_ | Newline-separated features to enable when building. |
-| `buildstd` | `true` | Set to `false` to disable building the standard library from source. Will also disable `debuginfo`. |
-| `debuginfo` | `true` | Set to `false` to disable generating and outputting split debuginfo. |
+| `buildstd` | _see [Build-std](#build-std)_ | Set to `false` to disable building the standard library from source. |
+| `debuginfo` | _see [Split debuginfo](#debuginfo)_ | Set to `false` to disable generating and outputting split debuginfo. |
 | `musl-libgcc` | `true` | Set to `false` to disable static-linking libgcc for musl builds. |
 | `use-cross` | `'auto'` | Force use of cross to compile. By default, will use cross if the target is not the host target. |
 | __🚩 Extra flags__ |||
@@ -528,6 +528,34 @@ specify its `ref` input.
 This action also does not bump versions or commit to the repository. You can use [release-pr] for
 that if you want a PR-based workflow, push to the repository directly, or use a different tool. It's
 up to you.
+
+## Build-std
+
+The [`build-std` feature] lets Cargo compile the standard library itself. It generally produces
+smaller or better-optimized binaries, but it's not always available, desired, or even working.
+
+[`build-std` feature]: https://doc.rust-lang.org/cargo/reference/unstable.html#build-std
+
+This action uses `build-std` by default **if**:
+- the `toolchain` selected is the latest nightly, or a dated nightly after `2020-01-01`, _and_
+- the `target` is one of a [hardcoded list of targets](./src/build-std-targets.ts), _and_
+- the `buildstd` input is not set to `false`.
+
+## Debuginfo
+
+The [`split-debuginfo` feature] lets rustc produce separate debuginfo files for binaries. This can
+significantly reduce the size of the final executable, while providing a way to debug it if needed.
+Specifically, the `packed` variant of the feature produces a single file containing all debuginfo,
+which is handy for packaging and distributing!
+
+[`split-debuginfo` feature]: https://doc.rust-lang.org/rustc/codegen-options/index.html#split-debuginfo
+
+This action uses `split-debuginfo` by default **if**:
+- the `toolchain` selected is the latest `stable` or `nightly`, a [stable >=1.65.0][stable-linux-d],
+  or a dated nightly after `2022-09-01`, _and_
+- the `debuginfo` input is not set to `false`.
+
+[stable-linux-d]: https://blog.rust-lang.org/2022/11/03/Rust-1.65.0.html#splitting-linux-debuginfo
 
 ## Packaging
 
@@ -716,7 +744,7 @@ _The `post-setup` hook is run._
   + the `--release` cargo profile is used.
   + the `--target` cargo option is set to the `target` input.
   + if `buildstd` is `true`, flags to build std as part of compilation are added to cargo.
-  + if `debuginfo` is `true` (and `buildstd` is not `false`), flags to produce packed split debuginfo are added to cargo.
+  + if `debuginfo` is `true`, flags to produce packed split debuginfo are added to cargo.
   + if `musl-libgcc` is `true`, flags to statically link `libgcc` are added to RUSTFLAGS iff the target's libc variant is musl.
   + the `extra-cargo-flags` input is stripped of newlines and appended to cargo.
   + the `extra-rustc-flags` input is stripped of newlines and appended to RUSTFLAGS.
