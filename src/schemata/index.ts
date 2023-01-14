@@ -2,7 +2,7 @@ import {debug} from '@actions/core';
 
 export {Pattern} from './common';
 import {Credentials, getCredentials} from './credentials';
-import {Setup, Toolchain, getSetup} from './setup';
+import {Setup,  getSetup} from './setup';
 import {Build, getBuild} from './build';
 import {Extras, getExtras} from './extras';
 import {Package, ArchiveFormat, getPackage} from './package';
@@ -11,7 +11,7 @@ import {Tag, getTag} from './tag';
 import {Release, getRelease} from './release';
 import {Hooks, getHooks} from './hooks';
 
-export {Credentials, Setup, Toolchain, Build, Extras, Package, ArchiveFormat, Publish, Tag, Release, Hooks};
+export {Credentials, Setup, Build, Extras, Package, ArchiveFormat, Publish, Tag, Release, Hooks};
 
 export default async function getInputs(): Promise<InputsType> {
 	debug('validating inputs');

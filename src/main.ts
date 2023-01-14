@@ -2,11 +2,26 @@ import {setFailed, debug} from '@actions/core';
 
 import getInputs from './schemata';
 import * as phase from './phases';
+import {buildStdEnabled} from './targets/build-std';
 
 (async () => {
 	try {
 		const inputs = await getInputs();
 		debug(`inputs: ${JSON.stringify(inputs)}`);
+
+		const newBuildStd = buildStdEnabled(inputs);
+		if (inputs.build.buildstd !== newBuildStd) {
+			debug(
+				`Given ${Object.entries({
+					buildstd: inputs.build.buildstd,
+					toolchain: inputs.setup.toolchain,
+					target: inputs.setup.target
+				})
+					.map(([k, v]) => `${k}=${v}`)
+					.join(',')}, overriding buildstd to ${newBuildStd}`
+			);
+			inputs.build.buildstd = newBuildStd;
+		}
 
 		debug('SETUP PHASE');
 		await phase.setup(inputs);

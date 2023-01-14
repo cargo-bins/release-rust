@@ -1,5 +1,6 @@
 import {getInput} from '@actions/core';
 import {object, string} from 'yup';
+import { Toolchain } from '../toolchain';
 
 const SCHEMA = object({
 	toolchain: string()
@@ -19,12 +20,6 @@ export interface Setup {
 	cosignVersion?: string;
 	crossVersion?: string;
 }
-
-export type Toolchain =
-	| 'stable'
-	| 'nightly'
-	| `1.${number}.${number}`
-	| `nightly-${number}-${number}-${number}`;
 
 export function runnerHostTarget(): string {
 	switch (process.env.RUNNER_OS) {
