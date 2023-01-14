@@ -627,7 +627,11 @@ as the toolchain setup can then be easily kept consistent between the two jobs.
 In that mode:
 - The setup phase is run.
 - The publish phase is run.
-  - If the crate is already published at that version, the action fails.
+  + If `publish-all-crates` is `true`, and:
+    * all the crates are already up to date, the action fails.
+    * any crate needs publishing, they are.
+  + otherwise, only the first/"release" crate is published:
+    * if it is already up to date, the action fails.
 - The action stops there.
 
 If you want to _only_ publish to crates.io and _not_ package the binaries in a separate job or
@@ -688,7 +692,18 @@ _The `post-setup` hook is run._
 
 #### Publish phase
 
-(action does not fail if version already exists in registry)
+- The action looks up the name of every crate in the workspace.
+- The `crates` input is evaluated as a list of globs, and matched against this list. The result is
+  the list of crates to package and release.
+- The action queries the `publish-registry` for the versions of each crate from that list (or from
+  the list of all crates if `publish-all-crates` is `true`) and compares them to the local version.
+  + If the local version is already published, and:
+    * `release-separately` is `true`: the crate is removed from the list of crates.
+    * `release-separately` is `false`: the crate is removed only from the list of crates to publish.
+  + Otherwise, the crate is kept in the list.
+- Crates from that list that are publishable are published to the `publish-registry`.
+  + if `publish-crate-only` is `true` and the list is empty, the action fails.
+- If `publish-crate-only` is true, the action stops here.
 
 #### Build phase
 
