@@ -690,7 +690,7 @@ Cosign:
 
 _The `post-setup` hook is run._
 
-#### Publish phase
+### Publish phase
 
 - The action looks up the name of every crate in the workspace.
 - The `crates` input is evaluated as a list of globs, and matched against this list. The result is
@@ -705,13 +705,13 @@ _The `post-setup` hook is run._
   + if `publish-crate-only` is `true` and the list is empty, the action fails.
 - If `publish-crate-only` is true, the action stops here.
 
-#### Build phase
+### Build phase
 
 - _If `custom-build` is set, it is called._
 - Otherwise, the build command is assembled from various inputs and defaults, then called.
 - _The `post-build` hook is run._
 
-#### Package phase
+### Package phase
 
 If `package-separately` is `true`, the following is run once for each crate:
 
@@ -728,9 +728,14 @@ If `package-separately` is `true`, the following is run once for each crate:
 
 _The `post-package` hook is run (only once)._
 
-#### Sign phase
+### Sign phase
 
-#### Release phase
+
+### Tag phase
+
+
+### Release phase
+
 
 ## Hook context
 
