@@ -608,17 +608,15 @@ each package will be uploaded to its own release.
 
 ### `release-separately`
 
-The action will create a tag and release for each crate, and upload the package for that crate to
-that release.
+The action will create a tag and release for each published crate, and upload the package (if any)
+for that crate to that release. It implies `package-separately: true`.
 
-The `release-notes`, `release-name`, and `release-tag` inputs
-will attempt to parse as JSON. If they are valid JSON, they will be parsed as an object mapping
-crate names to their respective values. If they are not valid JSON, they will be used as that value
-for all crates. The `$default$` key can be used to specify a value that will be used for crates not
-otherwise present in the object.
+The `release-notes` and `release-name` inputs will attempt to parse as JSON. If they are valid JSON,
+they will be parsed as an object mapping crate names to their respective values. If they are not,
+they will be used as that value for all crates. The `$default$` key can be used to specify a value
+that will be used for crates not otherwise present in the object.
 
-If `release-separately` is `true` _and_ `release-tag` is a single value, the action will fail, as
-it's not possible to use a single tag for multiple releases.
+See [Tag phase](#tag-phase) and [Release phase](#release-phase) for how this input affects them.
 
 ## Crates.io publish only mode
 
