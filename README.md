@@ -432,15 +432,15 @@ You should take note of [the particular behaviour of the `publish-crate-only` op
 
 ### Extra signing attestations
 
-(with extra cosign flags)
+TODO: with extra cosign flags
 
 ### Distribute signatures alongside packages
 
-(use extra cosign flags to write sig to outside, use post-package hook to bring sig files back in)
+TODO: use extra cosign flags to write sig to outside, use post-package hook to bring sig files back in
 
 ### Sign using GPG instead
 
-(disable sigstore, using post-sign hook to sign and write sig to outside, use post-package hook to bring sig files back in)
+TODO: disable sigstore, using post-sign hook to sign and write sig to outside, use post-package hook to bring sig files back in
 
 ## Inputs
 
@@ -643,9 +643,11 @@ workflow, you should not use this action, and do something like this instead:
 
 ## Signing
 
+TODO
+
 ## Action flow
 
-(add landscape diagram)
+TODO: add landscape diagram
 
 A particularity is that hooks run even if their phase's purpose is disabled, so they can be used to
 replace the functionality of a phase without changing the rest of the action.
