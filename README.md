@@ -1,4 +1,4 @@
-# Action: release-rust
+# ![Action: release-rust](./assets/title.png)
 
 An all-in-one action to build, optimise, tag, sign, and publish a Cargo-based Rust project.
 
@@ -653,7 +653,7 @@ TODO
 
 ## Action flow
 
-TODO: add landscape diagram
+![a diagram showing the seven phases of the action](./assets/flow.png)
 
 A particularity is that hooks run even if their phase's purpose is disabled, so they can be used to
 replace the functionality of a phase without changing the rest of the action.
