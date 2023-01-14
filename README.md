@@ -50,165 +50,24 @@ steps:
 
 The action needs no dependencies and runs on all hosted-spec runners (or compatible).
 
-## Inputs
-
-| Name | Default | Description |
-|:-|:-:|:-|
-| __🔑 Credentials__ |||
-| `github-token` | **required** | A github token to interact with the API and to use for OIDC claims. |
-| `crates-token` | _optional_ | A crates.io token with publish scope for the crate(s). If not provided, crates will not be published. |
-| __🧰 Setup options__ |||
-| `toolchain` | `'nightly'` | The rustup toolchain to use. |
-| `target` | _host target_ | The target to install and build for. |
-| `cosign-version` | _latest 1.x_ | Specify the [cosign] version to use. |
-| `binstall-version` | _latest_ | Specify the [cargo-binstall] version to use. |
-| __✂️ Function switches__ |||
-| `publish-crate` | `true` | Set to `false` to disable publishing to crates.io. |
-| `publish-crate-only` | `false` | Set to `true` to _only_ publish to crates.io. See [Crates.io publish only mode](#cratesio-publish-only-mode) for how this affects hooks. |
-| `publish-release` | `true` | Set to `false` to disable publishing a GitHub release. Packages will be left in the `packages/` directory. |
-| `use-cross` | `'auto'` | Force use of cross to compile. By default, will use cross if the target is not the host target. |
-| `use-sigstore` | `true` | Set to `false` to disable signing tags and packages with sigstore. |
-| __⚒️ Compilation options__ |||
-| `crates` | _all binary crates_ | Newline-separated list of crate globs to build within the workspace. |
-| `features` | _optional_ | Newline-separated features to enable when building. |
-| `buildstd` | `true` | Set to `false` to disable building the standard library from source. Will also disable `debuginfo`. |
-| `debuginfo` | `true` | Set to `false` to disable generating and outputting split debuginfo. |
-| `musl-libgcc` | `true` | Set to `false` to disable static-linking libgcc for musl builds. |
-| __🚩 Extra flags__ |||
-| `extra-rustup-components` | _optional_ | Extra components to install with rustup. |
-| `extra-cargo-flags` | _optional_ | Extra flags to pass to cargo build. |
-| `extra-rustc-flags` | _optional_ | Extra flags to pass to rustc (RUSTFLAGS). |
-| `extra-cosign-flags` | _optional_ | Extra flags to pass to cosign. |
-| __📦 Packaging options__ |||
-| `package-archive` | `'zip'` | [Packaging archive format](#packaging). |
-| `package-files` | _optional_ | Newline-separated list of file globs to include in the package in addition to compiled binaries. |
-| `package-name` | `'{crate}-{target}-{version}'` | Name of the package, excluding the extension. |
-| `package-in-dir` | `true` | Wrap the package contents in a directory with the same name before archiving. |
-| `package-separately` | `false` | Package each crate separately. |
-| `package-short-ext` | `false` | Use the short variant of the archive extension, if relevant for the format. E.g. `tgz` instead of `tar.gz`. |
-| `package-output` | `'packages/'` | Path to write finished packages to. |
-| __🚢 Github release__ |||
-| `release-notes` | _optional_ | Body of the github release. |
-| `release-name` | _version_ | Name of the github release. |
-| `release-tag` | _version_ | Tag to create for the release, or to use if it already exists. |
-| __🪝 Hooks__ |||
-| `post-setup` | _optional_ | Script to run after toolchain setup, but before building. |
-| `custom-build` | _optional_ | Completely [custom build script](#custom-build). Compilation options and extra cargo/rustc flags will be ignored if this is set. |
-| `post-build` | _optional_ | Script to run after building, but before packaging. |
-| `pre-package` | _optional_ | Script to run immediately before packaging. |
-| `post-package` | _optional_ | Script to run after packaging, but before signing. |
-| `post-sign` | _optional_ | Script to run after signing, but before publishing. |
-| `post-publish` | _optional_ | Script to run after publishing. |
-| `hooks-shell` | `'bash'` | Shell to use for all hooks. |
-
-### Github token permissions
-
-The github token needs to have:
-- `write` permission for `id-token` (OIDC for signing)
-- `write` permission for `contents` (releases and tags)
-
-### Checkout
-
-You're responsible for checking out the repository at the right commit for the build. In most cases,
-this will be the default behaviour of `actions/checkout@v3`, but in some situations you may need to
-specify its `ref` input.
-
-This action also does not bump versions or commit to the repository. You can use [release-pr] for
-that if you want a PR-based workflow, push to the repository directly, or use a different tool. It's
-up to you.
-
-### Packaging
-
-The `package-archive` input selects the package archive format. For all compressed formats, the
-maximum compression setting is used.
-
-| Value | Description |
-|:-:|:-|
-| `none` | Do not archive the package. This is an advanced option, and you should use `post-package-command` alongside it, otherwise you may not have anything to upload. |
-| `zip` | ZIP archive, with DEFLATE compression. This is the default, as it has the widest compatibility. |
-| `tar+gzip` | Posix (pax) TAR archive, with GZIP compression. |
-| `tar+bzip2` | Posix (pax) TAR archive, with BZIP2 compression. |
-| `tar+xz` | Posix (pax) TAR archive, with XZ compression. |
-| `tar+zstd` | Posix (pax) TAR archive, with ZSTD compression. |
-
-There's no support to select different formats based on the target: if you wish to, you should make
-that logic yourself in the workflow, prior to calling this action.
-
-The `package-name` input is a template string that will be used to name the package. The following
-placeholders can be used:
-
-- `{target}`: The target being built for.
-
-- `{crate}`: The name of the crate being built. If all crates are being built, this will be
-  the name of the first binary crate in lexicographic order. If the `crates` input is given, this
-  will be the name of the first crate in the resolved list.
-
-- `{version}`: The version of the crate being built. If all crates are being built, this will be
-  the version of the first binary crate in lexicographic order. If the `crates` input is given, this
-  will be the version of the first crate in the resolved list.
-
-The `package-separately` option affects the above, as each crate will be packaged separately. See
-the [With multiple crates](#with-multiple-crates) section for more details.
-
-## Outputs
-
-All outputs of a Github Action are strings.
-
-| Name | Description |
-|:-|:-|
-| `files` | Newline-separated list of files generated by the action. This does not include all built files, only those within the `package-output` path. |
-
-## Behaviour
-
-### Signing
-
-### Hooks
-
-(describe lifecycle/flow)
-
-Hooks run in different working directories:
-
-| Hook | Working directory |
-|:-:|:-|
-| `post-setup` | Runs in the working directory of the action (usually the top of the repo). |
-| `custom-build` | Runs in the working directory of the action. |
-| `post-build` | Runs in the working directory of the action. |
-| `pre-package` | Runs in a temporary directory filled with the built binaries and other `package-files`. |
-| `post-package` | Runs in the `package-output` directory. |
-| `post-sign` | Runs in the `package-output` directory. |
-| `post-publish` | Runs in the working directory of the action. |
-
-(hooks run even if their section is disabled, so can be used as replacement functionality)
-
-### Custom build
-
-(TODO: document expected output, e.g. binaries in target/...)
-
-### With multiple crates
-
-### Crates.io publish only mode
-
-When `publish-crate-only` is `true`, the action will only publish to crates.io. This is useful in
-some cases like [splitting the crates.io publish and the rest](#publishing-to-cratesio-before-or-after-packaging-anything)
-as the toolchain setup can then be easily kept consistent between the two jobs.
-
-In that mode:
-- The toolchain setup is performed, but without any default components.
-- The `post-setup` and `post-publish` hooks are run, if set.
-- Everything else is skipped: other hooks, the build, packaging, tagging, the release, etc.
-- The action will fail if the crate is already published at that version (in normal mode, such
-  failures are ignored).
-
-If you want to _only_ publish to crates.io and _not_ then package the binaries, you should not use
-this action, and do something like this instead:
-
-```yaml
-- uses: actions/checkout@v3
-- run: |
-    rustup toolchain install stable --profile minimal --no-self-update
-    rustup default stable
-- run: cargo publish
-```
+- **[Examples](#examples)**
+  + [Basic usage](#basic-usage)
+  + [Running on tags](#running-on-tags)
+  + [Installing compile-time dependencies](#installing-compile-time-dependencies)
+  + [Custom build: justfile](#custom-build-justfile)
+  + [Custom build: meson](#custom-build-meson)
+  + [Compile out panic messages](#compile-out-panic-messages)
+  + [Universal binaries on macOS](#universal-binaries-on-macos)
+  + [Filtering crates](#filtering-crates)
+  + [Filtering binaries](#filtering-binaries)
+  + [Publishing to crates.io before or after packaging anything](#publishing-to-cratesio-before-or-after-packaging-anything)
+  + [Extra signing attestations](#extra-signing-attestations)
+  + [Distribute signatures alongside packages](#distribute-signatures-alongside-packages)
+  + [Sign using GPG instead](#sign-using-gpg-instead)
+- **Documentation**
+  + [Inputs and outputs](#inputs)
+  + [Behaviour details](#details)
+  + [Full description of action flow](#action-flow)
 
 ## Examples
 
