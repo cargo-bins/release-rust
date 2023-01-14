@@ -47,7 +47,7 @@ steps:
     target: ${{ matrix.target }}
 ```
 
-- **[Examples](#examples)**
+- **Examples**
   + [Basic usage](#basic-usage)
   + [Running on tags](#running-on-tags)
   + [Installing compile-time dependencies](#installing-compile-time-dependencies)
