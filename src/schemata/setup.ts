@@ -12,6 +12,8 @@ const SCHEMA = object({
 	target: string(),
 	binstallVersion: string(),
 	cosignVersion: string(),
+	rekorVersion: string(),
+	gitsignVersion: string(),
 	crossVersion: string()
 }).noUnknown();
 
@@ -20,6 +22,8 @@ export interface Setup {
 	target: string;
 	binstallVersion?: string;
 	cosignVersion?: string;
+	rekorVersion?: string;
+	gitsignVersion?: string;
 	crossVersion?: string;
 }
 
@@ -42,6 +46,8 @@ export async function getSetup(): Promise<Setup> {
 		target: getInput('target'),
 		binstallVersion: getInput('binstall-version'),
 		cosignVersion: getInput('cosign-version'),
+		rekorVersion: getInput('rekor-version'),
+		gitsignVersion: getInput('gitsign-version'),
 		crossVersion: getInput('cross-version')
 	});
 
@@ -51,6 +57,14 @@ export async function getSetup(): Promise<Setup> {
 
 	if (inputs.cosignVersion && !satisfies(inputs.cosignVersion, '>=1.13.0')) {
 		throw new Error('cosign-version must be >=1.13.0');
+	}
+
+	if (inputs.rekorVersion && !satisfies(inputs.rekorVersion, '>=1.0.0')) {
+		throw new Error('rekor-version must be >=1.0.0');
+	}
+
+	if (inputs.gitsignVersion && !satisfies(inputs.gitsignVersion, '>=0.4.0')) {
+		throw new Error('gitsign-version must be >=1.0.0');
 	}
 
 	if (inputs.crossVersion && !satisfies(inputs.crossVersion, '>=0.2.0')) {

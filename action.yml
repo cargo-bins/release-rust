@@ -25,6 +25,10 @@ inputs:
     description: Specify the cargo-binstall version to use.
   cosign-version:
     description: Specify the cosign version to use.
+  rekor-version:
+    description: Specify the rekor version to use.
+  gitsign-version:
+    description: Specify the gitsign version to use.
   cross-version:
     description: Specify the cross version to use.
 

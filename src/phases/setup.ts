@@ -21,6 +21,8 @@ export default async function setupPhase(inputs: InputsType): Promise<void> {
 	await binstall(inputs);
 	await cross(inputs);
 	await cosign(inputs);
+	await rekor(inputs);
+	await gitsign(inputs);
 
 	await runHook(inputs, 'post-setup');
 }
@@ -100,18 +102,18 @@ async function binstall(inputs: InputsType): Promise<void> {
 		return;
 	}
 
-		info(`Installing cargo-binstall@${inputs.setup.binstallVersion}...`);
-		execAndSucceed('cargo', [
-			'binstall',
-			'-y',
-			'--no-symlinks',
-			'--install-path',
-			path,
-			'--force',
-			inputs.setup.binstallVersion
-				? `cargo-binstall@${inputs.setup.binstallVersion}`
-				: 'cargo-binstall'
-		]);
+	info(`Installing cargo-binstall@${inputs.setup.binstallVersion}...`);
+	execAndSucceed('cargo', [
+		'binstall',
+		'-y',
+		'--no-symlinks',
+		'--install-path',
+		path,
+		'--force',
+		inputs.setup.binstallVersion
+			? `cargo-binstall@${inputs.setup.binstallVersion}`
+			: 'cargo-binstall'
+	]);
 }
 
 interface CrossManifest {
@@ -223,6 +225,57 @@ async function cosign(inputs: InputsType): Promise<void> {
 	);
 	await mv(realPath, join(COSIGN_DIR, final));
 	info(`Installed cosign@${realVersion}`);
+}
+
+async function rekor(inputs: InputsType): Promise<void> {
+	info('Installing rekor...');
+
+	const version =
+		inputs.setup.rekorVersion ??
+		(await fetchLatestReleaseVersion(
+			inputs,
+			'sigstore',
+			'rekor',
+			'^1.0.0'
+		));
+
+	const {dl, final} = sigstoreToolFileName('rekor-cli');
+
+	debug(`Fetching rekor@${version}...`);
+	const path = await fetchSigstoreToolWithCosign(
+		`https://github.com/sigstore/rekor/releases/download/v${version}/${dl}`
+	);
+
+	await mv(path, join(COSIGN_DIR, final));
+	info(`Installed rekor@${version}`);
+}
+
+async function gitsign(inputs: InputsType): Promise<void> {
+	info('Installing gitsign...');
+
+	const version =
+		inputs.setup.gitsignVersion ??
+		(await fetchLatestReleaseVersion(
+			inputs,
+			'sigstore',
+			'gitsign',
+			'>=0.4.0'
+		));
+
+	// gitsign uses a different naming scheme for SOME REASON
+	let {dl, final} = sigstoreToolFileName(`gitsign_${version}`);
+	dl = dl.replace(/-/g, '_');
+	final = final.replace(`_${version}`, '');
+
+	debug(`Fetching gitsign@${version}...`);
+	const path = await fetchSigstoreToolWithCosign(
+		`https://github.com/sigstore/gitsign/releases/download/v${version}/${dl}`,
+		'cosign',
+		''
+	);
+
+	await mv(path, join(COSIGN_DIR, final));
+	info(`Installed gitsign@${version}`);
 }
 
 function sigstoreToolFileName(name: string): {

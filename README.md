@@ -13,7 +13,7 @@ This action is your one-stop shop for building and publishing a Rust project. It
   + static linking of libgcc for musl builds (`-C link-arg=-static-libgcc`),
   + outputting split debuginfo (`-C split-debuginfo=packed`).
 - Package binaries and support files in an archive
-- Sign the archive with [sigstore]'s [cosign]
+- Sign the archive with [sigstore]'s [cosign] and [rekor]
 - Tag the release if it isn't already, and sign the tag with [gitsign]
 - Publish the crate to crates.io
 - Publish the archives to GitHub Releases
@@ -29,6 +29,7 @@ of the latter.
 [cross]: https://github.com/cross-rs/cross
 [sigstore]: https://sigstore.dev
 [cosign]: https://github.com/sigstore/cosign
+[rekor]: https://github.com/sigstore/rekor
 [gitsign]: https://github.com/sigstore/gitsign
 
 Sounds complicated? Fear not! In most cases, using this action is the job of only few lines of YAML:
@@ -454,6 +455,8 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `target` | _host target_ | The target to install and build for. |
 | `binstall-version` | _latest_ | Specify the [cargo-binstall] version to use (0.20.0 and above). |
 | `cosign-version` | _latest 1.x_ | Specify the [cosign] version to use (1.13.0 and above). |
+| `rekor-version` | _latest 1.x_ | Specify the [rekor] version to use (1.0.0 and above). |
+| `gitsign-version` | _latest_ | Specify the [gitsign] version to use (0.4.0 and above). |
 | `cross-version` | _latest_ | Specify the [cross] version to use (0.2.0 and above). |
 | __⚒️ Build options__ |||
 | `crates` | _all crates_ | Newline-separated pattern list of crates to build within the workspace. |
@@ -725,6 +728,7 @@ Cosign:
   checksums hardcoded in this action (bootstrap).
 - Cosign is securely self-upgraded to the latest (or desired) version.
 - [gitsign] is downloaded, verified, and installed.
+- [rekor] is downloaded, verified, and installed.
 
 _The `post-setup` hook is run._
 
