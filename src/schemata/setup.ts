@@ -1,6 +1,8 @@
 import {getInput} from '@actions/core';
+import {satisfies} from 'semver';
 import {object, string} from 'yup';
-import { Toolchain } from '../toolchain';
+
+import {Toolchain} from '../toolchain';
 
 const SCHEMA = object({
 	toolchain: string()
@@ -10,7 +12,7 @@ const SCHEMA = object({
 	target: string(),
 	binstallVersion: string(),
 	cosignVersion: string(),
-	crossVersion: string(),
+	crossVersion: string()
 }).noUnknown();
 
 export interface Setup {
@@ -40,12 +42,24 @@ export async function getSetup(): Promise<Setup> {
 		target: getInput('target'),
 		binstallVersion: getInput('binstall-version'),
 		cosignVersion: getInput('cosign-version'),
-		crossVersion: getInput('cross-version'),
+		crossVersion: getInput('cross-version')
 	});
+
+	if (inputs.binstallVersion && !satisfies(inputs.binstallVersion, '>=0.20.0')) {
+		throw new Error('binstall-version must be >=0.20.0');
+	}
+
+	if (inputs.cosignVersion && !satisfies(inputs.cosignVersion, '>=1.13.0')) {
+		throw new Error('cosign-version must be >=1.13.0');
+	}
+
+	if (inputs.crossVersion && !satisfies(inputs.crossVersion, '>=0.2.0')) {
+		throw new Error('cross-version must be >=0.2.0');
+	}
 
 	return {
 		...inputs,
 		toolchain: inputs.toolchain as Toolchain,
-		target: inputs.target ?? runnerHostTarget(),
+		target: inputs.target ?? runnerHostTarget()
 	};
 }
