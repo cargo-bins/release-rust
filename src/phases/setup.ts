@@ -7,7 +7,7 @@ import {
 } from '@actions/tool-cache';
 import {info} from 'console';
 import {readFile} from 'fs/promises';
-import {checkData} from 'ssri';
+import {checkData, fromHex} from 'ssri';
 
 import {execAndSucceed, runHook} from '../exec';
 import {InputsType} from '../schemata/index';
@@ -22,6 +22,7 @@ export default async function setupPhase(inputs: InputsType): Promise<void> {
 }
 
 async function rustup(inputs: InputsType): Promise<void> {
+	info('Installing rust toolchain...');
 	const components = new Set(inputs.extras.rustupComponents);
 	if (inputs.build.buildstd) {
 		components.add('rust-src');
@@ -66,6 +67,7 @@ const BINSTALL_BOOTSTRAP_PACKAGE = {
 };
 
 async function binstall(inputs: InputsType): Promise<void> {
+	info('Installing cargo-binstall...');
 	const pkg =
 		BINSTALL_BOOTSTRAP_PACKAGE[
 			(process.env.RUNNER_OS ??
@@ -107,10 +109,55 @@ async function binstall(inputs: InputsType): Promise<void> {
 	}
 }
 
+interface CrossManifest {
+	[target: string]: {
+		url: string;
+		checksum: string;
+	};
+}
+
 async function cross(inputs: InputsType): Promise<void> {
-	// TODO
+	info('Installing cross...');
+	const manifestPath = await downloadTool(
+		'https://raw.githubusercontent.com/taiki-e/install-action/main/manifests/cross.json'
+	);
+	const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+
+	const version = inputs.setup.crossVersion ?? manifest.latest.version;
+	const versionInfo = manifest[version] as CrossManifest;
+	if (!versionInfo) {
+		throw new Error(
+			`Unsupported cross version: ${inputs.setup.crossVersion}`
+		);
+	}
+
+	let arch;
+	switch (process.env.RUNNER_OS) {
+		case 'Linux':
+			arch = versionInfo['x86_64_linux_musl'];
+			break;
+		case 'macOS':
+			arch = versionInfo['x86_64_macos'];
+			break;
+		case 'Windows':
+			arch = versionInfo['x86_64_windows'];
+			break;
+		default:
+			throw new Error(`Unsupported platform: ${process.env.RUNNER_OS}`);
+	}
+
+	const arcPath = await downloadTool(arch.url);
+	const sri = fromHex(arch.checksum, 'sha256');
+	checkData(await readFile(arcPath), sri, {error: true});
+
+	const folder = await extractTar(arcPath);
+	const path = await cacheDir(folder, 'cross', version);
+	addPath(path);
+
+	info(`Installed cross@${version}`);
 }
 
 async function cosign(inputs: InputsType): Promise<void> {
+	info('Installing cosign...');
 	// TODO
 }
