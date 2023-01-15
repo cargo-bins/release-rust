@@ -721,7 +721,7 @@ Cross:
 
 Cosign:
 
-- Version 1.13.0 is downloaded for the current platform, and checked against
+- Version 1.13.1 is downloaded for the current platform, and checked against
   checksums hardcoded in this action (bootstrap).
 - Cosign is securely self-upgraded to the latest (or desired) version.
 - [gitsign] is downloaded, verified, and installed.

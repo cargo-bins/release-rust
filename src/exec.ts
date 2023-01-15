@@ -1,10 +1,9 @@
-import { mkdtemp, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import {mkdtemp, writeFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 
-import { info } from '@actions/core';
-import { exec, ExecOptions } from '@actions/exec';
-import { debug } from 'console';
+import {debug, info} from '@actions/core';
+import {exec, ExecOptions} from '@actions/exec';
 
 import {InputsType} from './schemata/index';
 
@@ -66,7 +65,7 @@ export async function runHook(
 		RELEASE_ROOT: process.cwd(), // TODO: actually compute workspace root?
 		RELEASE_PACKAGE_OUTPUT: inputs.package.output,
 		RELEASE_TARGET: inputs.setup.target,
-		...environment,
+		...environment
 	};
 
 	debug('Creating temporary directory for hook script');
@@ -87,7 +86,7 @@ export async function runHook(
 	if (ext === 'cmd') {
 		await execAndSucceed('cmd', ['/c', `${path}`], {
 			cwd: workdir,
-			env,
+			env
 		});
 	} else {
 		const [prog, ...shellArgs] = inputs.hooks.shell.split(' ');

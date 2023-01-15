@@ -1,12 +1,16 @@
-import {addPath} from '@actions/core';
+import {readFile} from 'node:fs/promises';
+import {homedir} from 'node:os';
+import {basename, join} from 'node:path';
+
+import {addPath, debug, info} from '@actions/core';
+import {mkdirP, mv} from '@actions/io';
 import {
 	downloadTool,
 	extractTar,
 	extractZip,
 	cacheDir
 } from '@actions/tool-cache';
-import {info} from 'console';
-import {readFile} from 'fs/promises';
+import {rcompare, satisfies} from 'semver';
 import {checkData, fromHex} from 'ssri';
 
 import {execAndSucceed, runHook} from '../exec';
@@ -89,7 +93,13 @@ async function binstall(inputs: InputsType): Promise<void> {
 	);
 	addPath(path);
 
-	if (inputs.setup.binstallVersion !== BINSTALL_BOOTSTRAP_VERSION) {
+	if (inputs.setup.binstallVersion === BINSTALL_BOOTSTRAP_VERSION) {
+		info(
+			`staying with bootstrapped cargo-binstall@${inputs.setup.binstallVersion}`
+		);
+		return;
+	}
+
 		info(`Installing cargo-binstall@${inputs.setup.binstallVersion}...`);
 		execAndSucceed('cargo', [
 			'binstall',
@@ -102,11 +112,6 @@ async function binstall(inputs: InputsType): Promise<void> {
 				? `cargo-binstall@${inputs.setup.binstallVersion}`
 				: 'cargo-binstall'
 		]);
-	} else {
-		info(
-			`staying with bootstrapped cargo-binstall@${inputs.setup.binstallVersion}`
-		);
-	}
 }
 
 interface CrossManifest {
@@ -157,7 +162,139 @@ async function cross(inputs: InputsType): Promise<void> {
 	info(`Installed cross@${version}`);
 }
 
+const COSIGN_DIR = join(homedir(), '.cosign');
+const COSIGN_BOOTSTRAP_VERSION = '0.13.1';
+const COSIGN_BOOTSTRAP_PACKAGE = {
+	Linux: {
+		url: `https://github.com/sigstore/cosign/releases/download/v${COSIGN_BOOTSTRAP_VERSION}/cosign-linux-amd64`,
+		sri: 'sha512-y7rypv0grYX74WtHEPztUpVH+dO24YiBlLoQWINTz4DrpdVlAggxkKfpn9E9XPENSmmY+ARM8ywZ+S/WpH6lKg=='
+	},
+	macOS: {
+		url: `https://github.com/sigstore/cosign/releases/download/v${COSIGN_BOOTSTRAP_VERSION}/cosign-darwin-amd64`,
+		sri: 'sha512-rB6DPtDtQPvRtXJS+xAQ+fIZwZ3CYPSoS25qQIODsBeY09FgvXQOb5EpQvyoZbfTbF0OrOsAU3S0rxYeXnuzjw=='
+	},
+	Windows: {
+		url: `https://github.com/sigstore/cosign/releases/download/v${COSIGN_BOOTSTRAP_VERSION}/cosign-windows-amd64.exe`,
+		sri: 'sha512-V8uTLshlhOFt3b7W9XHvBiGInbbTPLds5KbitjrqXVb0kVu82e9aEKYTAILYEa+pPykN8WNmHPEJurVe0E3LYw=='
+	}
+};
+
 async function cosign(inputs: InputsType): Promise<void> {
 	info('Installing cosign...');
-	// TODO
+	const pkg =
+		COSIGN_BOOTSTRAP_PACKAGE[
+			(process.env.RUNNER_OS ??
+				'') as keyof typeof COSIGN_BOOTSTRAP_PACKAGE
+		];
+	if (!pkg) {
+		throw new Error(`Unsupported platform: ${process.env.RUNNER_OS}`);
+	}
+
+	const {dl, final} = sigstoreToolFileName('cosign');
+
+	const bsPath = await downloadTool(pkg.url);
+	checkData(await readFile(bsPath), pkg.sri, {error: true});
+	debug(
+		`Downloaded bootstrapping cosign@${COSIGN_BOOTSTRAP_VERSION} to ${bsPath}`
+	);
+
+	await mkdirP(COSIGN_DIR);
+	addPath(COSIGN_DIR);
+
+	const realVersion =
+		inputs.setup.cosignVersion ??
+		(await fetchLatestReleaseVersion(
+			inputs,
+			'sigstore',
+			'cosign',
+			'^1.13.0'
+		));
+
+	if (realVersion === COSIGN_BOOTSTRAP_VERSION) {
+		info(`Staying with bootstrapped cosign@${realVersion}`);
+		await mv(bsPath, join(COSIGN_DIR, final));
+		return;
+	}
+
+	debug(`Fetching cosign@${realVersion}...`);
+	const realPath = await fetchSigstoreToolWithCosign(
+		`https://github.com/sigstore/cosign/releases/download/v${realVersion}/${dl}`,
+		bsPath
+	);
+	await mv(realPath, join(COSIGN_DIR, final));
+	info(`Installed cosign@${realVersion}`);
+}
+
+function sigstoreToolFileName(name: string): {
+	dl: string;
+	final: string;
+} {
+	let platform;
+	let ext = '';
+	switch (process.env.RUNNER_OS) {
+		case 'Linux':
+			platform = 'linux';
+			break;
+		case 'macOS':
+			platform = 'darwin';
+			break;
+		case 'Windows':
+			platform = 'windows';
+			ext = '.exe';
+			break;
+		default:
+			throw new Error(`Unsupported platform: ${process.env.RUNNER_OS}`);
+	}
+
+	return {dl: `${name}-${platform}-amd64${ext}`, final: `${name}${ext}`};
+}
+
+async function fetchLatestReleaseVersion(
+	inputs: InputsType,
+	owner: string,
+	repo: string,
+	matches: string
+): Promise<string | undefined> {
+	debug(`Fetching all ${repo} versions...`);
+	const allVersionsQL: {
+		repository: {releases: {nodes: {tagName: string}[]}};
+	} = await inputs.credentials.github.graphql(`query {
+		repository(owner: "${owner}", name: "${repo}") {
+			releases(last: 100) {
+				nodes {
+					tagName
+				}
+			}
+		}
+	}`);
+
+	return allVersionsQL.repository.releases.nodes
+		.map(r => r.tagName)
+		.filter(v => v.startsWith('v'))
+		.map(v => v.slice(1))
+		.filter(v => satisfies(v, matches))
+		.sort(rcompare)[0];
+}
+
+async function fetchSigstoreToolWithCosign(
+	url: string,
+	cosignPath: string = 'cosign',
+	sigsSuffix: string = '-keyless'
+): Promise<string> {
+	const path = await downloadTool(url);
+	const sig = await downloadTool(`${url}${sigsSuffix}.sig`);
+	const crt = await downloadTool(`${url}${sigsSuffix}.pem`);
+
+	debug(`Verifying ${url} with ${cosignPath}...`);
+	await execAndSucceed(
+		cosignPath,
+		['verify-blob', '--certificate', crt, '--signature', sig, path],
+		{
+			env: {
+				COSIGN_EXPERIMENTAL: '1'
+			}
+		}
+	);
+
+	return path;
 }
