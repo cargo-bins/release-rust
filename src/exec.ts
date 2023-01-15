@@ -19,6 +19,36 @@ export async function execAndSucceed(
 	}
 }
 
+export async function execAndSucceedWithOutput(
+	command: string,
+	args: string[],
+	options?: ExecOptions
+): Promise<{ stdout: string; stderr: string; }> {
+	info(`Running command (grabbing output): ${command} ${args.join(' ')}`);
+
+	let stdout = '';
+	let stderr = '';
+	const exitCode = await exec(command, args, {
+		...options,
+		listeners: {
+			stdout: (data: Buffer) => {
+				stdout += data.toString();
+			},
+			stderr: (data: Buffer) => {
+				stderr += data.toString();
+			}
+		}
+	});
+
+	if (exitCode !== 0) {
+		debug(`=== Command output on STDOUT:\n${stdout}`);
+		debug(`=== Command output on STDERR:\n${stderr}`);
+		throw new Error(`Command failed with exit code ${exitCode}`);
+	}
+
+	return { stdout, stderr };
+}
+
 export async function runHook(
 	inputs: InputsType,
 	name: string,
