@@ -770,27 +770,28 @@ _The `post-setup` hook is run._
 ### Build phase
 
 The value of `use-cross` is determined as follows, in this order:
-  - if it is provided as input, that value is used;
-  - if the `target` input is the host target, it is `false`;
-  - if the `target` input is in [a hardcoded list of cross targets][cross-targets], it is `true`;
-  - otherwise, it is `false`.
+- if it is provided as input, that value is used;
+- if the `target` input is the host target, it is `false`;
+- if the `target` input is in [a hardcoded list of cross targets][cross-targets], it is `true`;
+- otherwise, it is `false`.
 
 [cross-targets]: ./src/targets/cross.ts
 
 _If `custom-build` is set, it is called._
 
 Otherwise, the build command is assembled and called:
-  - if `use-cross` is `true`, the `cross` command is used instead of `cargo`.
-  - the `--release` cargo profile is used.
-  - the `--target` cargo option is set to the `target` input.
-  - if `buildstd` is `true`, flags to build std as part of compilation are added to cargo.
-  - if `debuginfo` is `true`, flags to produce packed split debuginfo are added to cargo.
-  - if `musl-libgcc` is `true`, flags to statically link `libgcc` are added to RUSTFLAGS iff the target's libc variant is musl.
-  - if `crt-static` is set, the `-C target-feature=` rustflag is set to either `+crt-static` (if true) or `-crt-static` (if false).
-    + otherwise, if the target contains `-alpine-linux-musl`, it is set to `-crt-static`.
-    + otherwise, if the target is MSVC, it is set to `+crt-static`.
-  - the `extra-cargo-flags` input is stripped of newlines, [parsed as shell (for quotes)][shell-quote], and appended to cargo.
-  - the `extra-rustc-flags` input is stripped of newlines, [parsed as shell (for quotes)][shell-quote], and appended to RUSTFLAGS.
+- if `use-cross` is `true`, the `cross` command is used instead of `cargo`.
+- the `--release` cargo profile is used.
+- the `--target` cargo option is set to the `target` input.
+- a `--package` option is added for each crate in the list of crates to build.
+- if `buildstd` is `true`, flags to build std as part of compilation are added to cargo.
+- if `debuginfo` is `true`, flags to produce packed split debuginfo are added to cargo.
+- if `musl-libgcc` is `true`, flags to statically link `libgcc` are added to RUSTFLAGS iff the target's libc variant is musl.
+- if `crt-static` is set, the `-C target-feature=` rustflag is set to either `+crt-static` (if true) or `-crt-static` (if false).
+  + otherwise, if the target contains `-alpine-linux-musl`, it is set to `-crt-static`.
+  + otherwise, if the target is MSVC, it is set to `+crt-static`.
+- the `extra-cargo-flags` input is stripped of newlines, [parsed as shell (for quotes)][shell-quote], and appended to cargo.
+- the `extra-rustc-flags` input is stripped of newlines, [parsed as shell (for quotes)][shell-quote], and appended to RUSTFLAGS.
 
 [shell-quote]: https://www.npmjs.com/package/shell-quote
 
@@ -799,7 +800,6 @@ _The `post-build` hook is run._
 ### Package phase
 
 If `package-separately` is `true`, the following is run once for each crate:
-
 - A temporary directory is created.
 - If `custom-build` was not used, the binaries and debuginfo are copied to the temporary directory.
 - The `package-files` input is evaluated and its results are copied to the temporary directory.

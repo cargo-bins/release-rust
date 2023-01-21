@@ -49,6 +49,15 @@ export async function execAndSucceedWithOutput(
 	return { stdout, stderr };
 }
 
+export function hookEnv(inputs: InputsType): { [key: string]: string } {
+	return {
+		...process.env,
+		RELEASE_ROOT: process.cwd(), // TODO: actually compute workspace root?
+		RELEASE_PACKAGE_OUTPUT: inputs.package.output,
+		RELEASE_TARGET: inputs.setup.target
+	};
+}
+
 export async function runHook(
 	inputs: InputsType,
 	name: string,
@@ -91,10 +100,7 @@ export async function runHook(
 	}
 
 	const env = {
-		...process.env,
-		RELEASE_ROOT: process.cwd(), // TODO: actually compute workspace root?
-		RELEASE_PACKAGE_OUTPUT: inputs.package.output,
-		RELEASE_TARGET: inputs.setup.target,
+		...hookEnv(inputs),
 		...environment
 	};
 

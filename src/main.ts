@@ -35,10 +35,10 @@ import {buildStdEnabled} from './targets/build-std';
 		}
 
 		debug('BUILD PHASE');
-		await phase.build(inputs, crates);
+		const buildOutput = await phase.build(inputs, crates);
 
 		debug('PACKAGE PHASE');
-		await phase.package(inputs, crates);
+		await phase.package(inputs, crates, buildOutput);
 
 		debug('SIGN PHASE');
 		await phase.sign(inputs, crates);

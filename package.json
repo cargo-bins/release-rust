@@ -25,6 +25,7 @@
 		"crates.io": "^2.2.2",
 		"minimatch": "^6.1.5",
 		"semver": "^7.3.8",
+		"shell-quote": "^1.7.4",
 		"ssri": "^10.0.1",
 		"yup": "^1.0.0-beta.7"
 	},
@@ -33,6 +34,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^18.11.18",
+		"@types/shell-quote": "^1.7.1",
 		"@types/ssri": "^7.1.1",
 		"@typescript-eslint/parser": "^5.48.2",
 		"@vercel/ncc": "^0.36.0",
