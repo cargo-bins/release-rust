@@ -729,8 +729,14 @@ Cosign:
 - Version 1.13.1 is downloaded for the current platform, and checked against
   checksums hardcoded in this action (bootstrap).
 - Cosign is securely self-upgraded to the latest (or desired) version.
-- [gitsign] is downloaded, verified, and installed.
 - [rekor] is downloaded, verified, and installed.
+- [gitsign] is downloaded, verified, and installed.
+  - if `tag-sign: true`, gitsign is set as the signing program for git, and tags are set to be
+    signed by default.
+
+The git user is configured:
+- Name: `GitHub Actions (release-rust)`
+- Email: the internal github email address for GitHub Actions.
 
 _The `post-setup` hook is run._
 

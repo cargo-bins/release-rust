@@ -28,6 +28,8 @@ export default async function setupPhase(inputs: InputsType): Promise<void> {
 		await configureGitsign();
 	}
 
+	await configureGitUser();
+
 	await runHook(inputs, 'post-setup');
 }
 
@@ -284,12 +286,7 @@ async function gitsign(inputs: InputsType): Promise<void> {
 
 async function configureGitsign(): Promise<void> {
 	info('Configuring git to use gitsign...');
-	await execAndSucceed('git', [
-		'config',
-		'--global',
-		'commit.gpgsign',
-		'true'
-	]);
+	await execAndSucceed('git', ['config', '--global', 'tag.gpgsign', 'true']);
 	await execAndSucceed('git', [
 		'config',
 		'--global',
@@ -297,7 +294,9 @@ async function configureGitsign(): Promise<void> {
 		'gitsign'
 	]);
 	await execAndSucceed('git', ['config', '--global', 'gpg.format', 'x509']);
+}
 
+async function configureGitUser(): Promise<void> {
 	info('Configuring git user...');
 	await execAndSucceed('git', [
 		'config',
