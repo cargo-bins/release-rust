@@ -464,6 +464,7 @@ TODO: disable sigstore, using post-sign hook to sign and write sig to outside, u
 | `buildstd` | _see [Build-std](#build-std)_ | Set to `false` to disable building the standard library from source. |
 | `debuginfo` | _see [Split debuginfo](#debuginfo)_ | Set to `false` to disable generating and outputting split debuginfo. |
 | `musl-libgcc` | `true` | Set to `false` to disable static-linking libgcc for musl builds. |
+| `crt-static` | _see [C runtime linking](#c-runtime-linking)_ | Statically link the [C runtime](https://rust-lang.github.io/rfcs/1721-crt-static.html). |
 | `use-cross` | _see [Build phase](#build-phase)_ | Force use/non-use of cross to compile. By default, will use cross if the target is not the host target. |
 | __🚩 Extra flags__ |||
 | `extra-rustup-components` | _optional_ | Extra components to install with rustup. |
@@ -569,6 +570,16 @@ This action uses `split-debuginfo` **if**:
 - the `debuginfo` input is not set to `false`.
 
 [stable-linux-d]: https://blog.rust-lang.org/2022/11/03/Rust-1.65.0.html#splitting-linux-debuginfo
+
+## C runtime linking
+
+The [`crt-static` feature] controls whether the C runtime is statically or dynamically linked. This
+is by default set by the target, but can be overridden. We set it to `true` on MSVC targets, to
+produce portable executables which do not need the runtime installed separately, and to `false` if
+the target is `*-alpine-linux-musl`, to conform with Alpine's expectation that musl is dynamically
+linked to. Otherwise the `crt-static` input is left empty, and the target's default will be used.
+
+[`crt-static` feature]: https://doc.rust-lang.org/rustc/codegen-options/index.html#crt-static
 
 ## Packaging
 
@@ -775,8 +786,9 @@ Otherwise, the build command is assembled and called:
   - if `buildstd` is `true`, flags to build std as part of compilation are added to cargo.
   - if `debuginfo` is `true`, flags to produce packed split debuginfo are added to cargo.
   - if `musl-libgcc` is `true`, flags to statically link `libgcc` are added to RUSTFLAGS iff the target's libc variant is musl.
-  - the `extra-cargo-flags` input is stripped of newlines and appended to cargo.
-  - the `extra-rustc-flags` input is stripped of newlines and appended to RUSTFLAGS.
+  - if `crt-static` is set, the `-C target-feature=` rustflag is set to either `+crt-static` (if true) or `-crt-static` (if false).
+    + otherwise, if the target contains `-alpine-linux-musl`, it is set to `-crt-static`.
+    + otherwise, if the target is MSVC, it is set to `+crt-static`.
 
 _The `post-build` hook is run._
 

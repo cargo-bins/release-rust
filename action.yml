@@ -46,6 +46,8 @@ inputs:
   musl-libgcc:
     description: Set to `false` to disable static-linking libgcc for musl builds.
     default: 'true'
+  crt-static:
+    description: Force static/dynamic-linking of the C runtime.
   use-cross:
     description: Force use/non-use of cross to compile.
 

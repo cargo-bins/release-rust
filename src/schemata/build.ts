@@ -18,6 +18,7 @@ const SCHEMA = object({
 	buildstd: boolean().default(true).required(),
 	debuginfo: boolean().default(true).required(),
 	muslLibGcc: boolean().default(true).required(),
+	crtStatic: boolean(),
 	useCross: boolean(),
 }).noUnknown();
 
@@ -27,6 +28,7 @@ export interface Build {
 	buildstd: boolean;
 	debuginfo: boolean;
 	muslLibGcc: boolean;
+	crtStatic?: boolean;
 	useCross?: boolean;
 }
 
@@ -37,6 +39,7 @@ export async function getBuild(): Promise<Build> {
 		buildstd: getInput('buildstd'),
 		debuginfo: getInput('debuginfo'),
 		muslLibGcc: getInput('musl-libgcc'),
+		crtStatic: getInput('crt-static'),
 		useCross: getInput('use-cross'),
 	});
 }
