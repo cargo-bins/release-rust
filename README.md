@@ -524,6 +524,8 @@ it is included in the output list.
 The list may also contain negative patterns, which are prefixed with `!`. If an item matches a
 negative pattern, regardless of whether it matches a positive pattern, it is excluded from the list.
 
+Matching is done using [minimatch](https://www.npmjs.com/package/minimatch).
+
 ## Github token permissions
 
 The github token needs to have:

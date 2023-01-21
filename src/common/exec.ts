@@ -5,7 +5,7 @@ import {join} from 'node:path';
 import {debug, info} from '@actions/core';
 import {exec, ExecOptions} from '@actions/exec';
 
-import {InputsType} from './schemata/index';
+import {InputsType} from '../schemata/index';
 
 export async function execAndSucceed(
 	command: string,

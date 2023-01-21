@@ -2,7 +2,7 @@ import {getInput} from '@actions/core';
 import {satisfies} from 'semver';
 import {object, string} from 'yup';
 
-import {Toolchain} from '../toolchain';
+import {Toolchain} from '../common/toolchain';
 
 const SCHEMA = object({
 	toolchain: string()

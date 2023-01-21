@@ -1,4 +1,4 @@
-import {execAndSucceedWithOutput} from '../exec';
+import {execAndSucceedWithOutput} from '../common/exec';
 
 export async function cargoMetadata(): Promise<CargoMetadata> {
 	const {stdout: json} = await execAndSucceedWithOutput('cargo', [

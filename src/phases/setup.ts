@@ -13,7 +13,7 @@ import {
 import {rcompare, satisfies} from 'semver';
 import {checkData, fromHex} from 'ssri';
 
-import {execAndSucceed, runHook} from '../exec';
+import {execAndSucceed, runHook} from '../common/exec';
 import {InputsType} from '../schemata/index';
 
 export default async function setupPhase(inputs: InputsType): Promise<void> {
