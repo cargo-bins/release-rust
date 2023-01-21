@@ -1,4 +1,4 @@
-import {debug, info} from '@actions/core';
+import {info} from '@actions/core';
 import {parse as shellParse} from 'shell-quote';
 
 import {CargoPackage} from '../cargo/metadata';
@@ -10,7 +10,7 @@ import {allowedCrossTarget} from '../targets/cross';
 export default async function buildPhase(
 	inputs: InputsType,
 	crates: CargoPackage[]
-): Promise<string | null> {
+): Promise<string | undefined> {
 	let useCross;
 	if (inputs.build.useCross !== undefined) {
 		useCross = inputs.build.useCross;
@@ -22,9 +22,9 @@ export default async function buildPhase(
 		useCross = false;
 	}
 
-	let output = null;
+	let output;
 	if (inputs.hooks.customBuild) {
-		await runHook(inputs, 'customBuild');
+		await runHook(inputs, 'custom-build');
 	} else {
 		const buildCommand = useCross ? 'cross' : 'cargo';
 		const buildArgs = [
