@@ -9,7 +9,7 @@ export async function cargoMetadata(): Promise<CargoMetadata> {
 	return JSON.parse(json);
 }
 
-interface CargoMetadata {
+export interface CargoMetadata {
 	packages: CargoPackage[];
 	target_directory: string;
 	version: 1;
@@ -17,7 +17,7 @@ interface CargoMetadata {
 	workspace_root: string;
 }
 
-interface CargoPackage {
+export interface CargoPackage {
 	name: string;
 	version: string;
 	source: null | string;
@@ -31,7 +31,7 @@ interface CargoPackage {
 	rust_version: string | null;
 }
 
-interface CargoPackageTarget {
+export interface CargoPackageTarget {
 	kind: TargetKind[];
 	crate_types: CrateType[];
 	name: string;
@@ -39,8 +39,8 @@ interface CargoPackageTarget {
 	test: boolean;
 }
 
-type TargetKind = 'bin' | 'lib' | 'example' | 'test' | 'bench' | 'custom-build';
-type CrateType =
+export type TargetKind = 'bin' | 'lib' | 'example' | 'test' | 'bench' | 'custom-build';
+export type CrateType =
 	| 'bin'
 	| 'lib'
 	| 'rlib'

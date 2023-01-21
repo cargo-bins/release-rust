@@ -1,12 +1,14 @@
 import {debug} from '@actions/core';
-import {cargoMetadata} from '../cargo/metadata';
+import {CargoPackage, cargoMetadata} from '../cargo/metadata';
 import {PatternList} from '../common/pattern-list';
 import {runHook} from '../common/exec';
 import {InputsType} from '../schemata/index';
 import {isVersionPublished} from '../cargo/api';
-import { cargoPublish } from '../cargo/publish';
+import {cargoPublish} from '../cargo/publish';
 
-export default async function publishPhase(inputs: InputsType): Promise<void> {
+export default async function publishPhase(
+	inputs: InputsType
+): Promise<CargoPackage[]> {
 	const cargoMeta = await cargoMetadata();
 	const allLocalCrates = cargoMeta.packages.filter(p => p.source === null);
 	debug(
@@ -85,4 +87,5 @@ export default async function publishPhase(inputs: InputsType): Promise<void> {
 	}
 
 	await runHook(inputs, 'post-publish');
+	return cratesToPackageAndRelease;
 }

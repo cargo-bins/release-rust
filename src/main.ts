@@ -27,7 +27,7 @@ import {buildStdEnabled} from './targets/build-std';
 		await phase.setup(inputs);
 
 		debug('PUBLISH PHASE');
-		await phase.publish(inputs);
+		const crates = await phase.publish(inputs);
 
 		if (inputs.publish.crateOnly) {
 			debug('publish-crate-only is on, we are DONE!');
@@ -35,19 +35,19 @@ import {buildStdEnabled} from './targets/build-std';
 		}
 
 		debug('BUILD PHASE');
-		await phase.build(inputs);
+		await phase.build(inputs, crates);
 
 		debug('PACKAGE PHASE');
-		await phase.package(inputs);
+		await phase.package(inputs, crates);
 
 		debug('SIGN PHASE');
-		await phase.sign(inputs);
+		await phase.sign(inputs, crates);
 
 		debug('TAG PHASE');
-		await phase.tag(inputs);
+		await phase.tag(inputs, crates);
 
 		debug('RELEASE PHASE');
-		await phase.release(inputs);
+		await phase.release(inputs, crates);
 
 		debug('DONE');
 		return;
