@@ -35,6 +35,10 @@ export default async function buildPhase(
 		];
 		const rustflags = [];
 
+		if (inputs.build.features.length > 0) {
+			buildArgs.push('--features', inputs.build.features.join(','));
+		}
+
 		if (inputs.build.buildstd) {
 			buildArgs.push('-Z', 'build-std=std');
 		}
