@@ -789,6 +789,10 @@ Otherwise, the build command is assembled and called:
   - if `crt-static` is set, the `-C target-feature=` rustflag is set to either `+crt-static` (if true) or `-crt-static` (if false).
     + otherwise, if the target contains `-alpine-linux-musl`, it is set to `-crt-static`.
     + otherwise, if the target is MSVC, it is set to `+crt-static`.
+  - the `extra-cargo-flags` input is stripped of newlines, [parsed as shell (for quotes)][shell-quote], and appended to cargo.
+  - the `extra-rustc-flags` input is stripped of newlines, [parsed as shell (for quotes)][shell-quote], and appended to RUSTFLAGS.
+
+[shell-quote]: https://www.npmjs.com/package/shell-quote
 
 _The `post-build` hook is run._
 
