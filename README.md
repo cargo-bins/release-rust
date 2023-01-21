@@ -786,8 +786,6 @@ If `package-separately` is `true`, the following is run once for each crate:
 
 - A temporary directory is created.
 - If `custom-build` was not used, the binaries and debuginfo are copied to the temporary directory.
-  - if a nightly compiler was used, JSON output was enabled and parsed to find these artifacts.
-  - otherwise, the action guesses at the location of the built binaries and debuginfo.
 - The `package-files` input is evaluated and its results are copied to the temporary directory.
 - _The `pre-package` hook is run (for each package if `package-separately` is true)._
 - If `package-in-dir` is `true`, another directory named `package-name` is created, and the contents
