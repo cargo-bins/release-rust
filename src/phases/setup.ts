@@ -309,7 +309,7 @@ async function configureGitUser(): Promise<void> {
 		'config',
 		'--global',
 		'user.email',
-		'"41898282+github-actions[bot]@users.noreply.github.com>"'
+		'41898282+github-actions[bot]@users.noreply.github.com>'
 	]);
 }
 
