@@ -24,6 +24,10 @@ export default async function setupPhase(inputs: InputsType): Promise<void> {
 	await rekor(inputs);
 	await gitsign(inputs);
 
+	if (inputs.tag.sign) {
+		await configureGitsign();
+	}
+
 	await runHook(inputs, 'post-setup');
 }
 
@@ -276,6 +280,38 @@ async function gitsign(inputs: InputsType): Promise<void> {
 
 	await mv(path, join(COSIGN_DIR, final));
 	info(`Installed gitsign@${version}`);
+}
+
+async function configureGitsign(): Promise<void> {
+	info('Configuring git to use gitsign...');
+	await execAndSucceed('git', [
+		'config',
+		'--global',
+		'commit.gpgsign',
+		'true'
+	]);
+	await execAndSucceed('git', [
+		'config',
+		'--global',
+		'gpg.x509.program',
+		'gitsign'
+	]);
+	await execAndSucceed('git', ['config', '--global', 'gpg.format', 'x509']);
+
+	info('Configuring git user...');
+	await execAndSucceed('git', [
+		'config',
+		'--global',
+		'user.name',
+		'GitHub Actions (release-rust)'
+	]);
+	// This email identifies the commit as GitHub Actions - see https://github.com/orgs/community/discussions/26560
+	await execAndSucceed('git', [
+		'config',
+		'--global',
+		'user.email',
+		'"41898282+github-actions[bot]@users.noreply.github.com>"'
+	]);
 }
 
 function sigstoreToolFileName(name: string): {
