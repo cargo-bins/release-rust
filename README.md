@@ -701,7 +701,31 @@ workflow, you should not use this action, and do something like this instead:
 
 ## Signing
 
-TODO
+TODO: This section is still provisional.
+
+Signing uses [sigstore]'s public infrastructure.
+
+Artifact signing using Sigstore works by obtaining the SHA256 checksum of an artifact, signing that
+checksum with a use-once certificate which asserts facts about the signing party, and then uploading
+the signature to a public ledger called Rekor. The certificate is obtained by generating a key pair
+locally, and then submitting a request along with an OIDC token to the Fulcio authority, which bakes
+the claims from the OIDC token into a certificate with a short validity.
+
+In our case, the OIDC token is obtained from GitHub, and the claims include the repository name/org,
+inciting workflow, and commit information, [among other details][gh-oidc-claims].
+
+Artifact verification, as implemented in Cargo Binstall, relies on the Rekor public ledger: the
+SHA256 checksum of the artifact is looked up in Rekor, which contains one or more signatures for the
+sum. Each signature includes which certificate was used to sign, and that in turn contains the OIDC
+claims. As Binstall knows the repository URL, it verifies that the OIDC claims match, assuring that
+the artifact was created and signed in the context of a GitHub Action on that repository.
+
+In the default configuration, the signature and certificate are only kept in Sigstore. You can also
+[configure the action to upload those to the GitHub release](#distribute-signatures-alongside-packages),
+which "blesses" a specific signature as the one that should be used to verify the artifact, and only
+requires the verifier to check the authenticity of the certificate.
+
+[gh-oidc-claims]: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#understanding-the-oidc-token
 
 ## Action flow
 
@@ -799,7 +823,8 @@ _The `post-build` hook is run._
 
 ### Package phase
 
-If `package-separately` is `true`, the following is run once for each crate:
+If `package-separately` is `true`, the following is run for each crate. Otherwise, it is run once.
+
 - A temporary directory is created.
 - If `custom-build` was not used, the binaries and debuginfo are copied to the temporary directory.
 - The `package-files` input is evaluated and its results are copied to the temporary directory.
