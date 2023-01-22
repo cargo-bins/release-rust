@@ -41,7 +41,7 @@ import {buildStdEnabled} from './targets/build-std';
 		await phase.package(inputs, crates, release, buildOutput);
 
 		debug('SIGN PHASE');
-		await phase.sign(inputs, crates);
+		await phase.sign(inputs);
 
 		debug('TAG PHASE');
 		await phase.tag(inputs, crates);
