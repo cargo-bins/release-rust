@@ -1,5 +1,6 @@
 import {debug, isDebug} from '@actions/core';
 import {Minimatch} from 'minimatch';
+import { glob } from './glob';
 
 export class PatternList {
 	readonly patterns: Minimatch[];
@@ -38,5 +39,17 @@ export class PatternList {
 
 	matchListBy<T>(values: T[], fn: (value: T) => string): T[] {
 		return values.filter(value => this.matchOne(fn(value)));
+	}
+
+	async findFiles(): Promise<string[]> {
+		const files = [];
+		for (const pattern of this.patterns) {
+			if (pattern.negate) continue;
+			debug(`Running glob: "${pattern.pattern}"`);
+			files.push(...await glob(pattern.pattern));
+		}
+
+		debug(`Re-filtering to remove negated patterns`);
+		return this.matchList(files);
 	}
 }

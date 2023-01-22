@@ -8,7 +8,7 @@ import {cargoPublish} from '../cargo/publish';
 
 export default async function publishPhase(
 	inputs: InputsType
-): Promise<CargoPackage[]> {
+): Promise<{crates: CargoPackage[]; release: CargoPackage}> {
 	const cargoMeta = await cargoMetadata();
 	const allLocalCrates = cargoMeta.packages.filter(p => p.source === null);
 	debug(
@@ -87,5 +87,46 @@ export default async function publishPhase(
 	}
 
 	await runHook(inputs, 'post-publish');
-	return cratesToPackageAndRelease;
+	return {
+		crates: cratesToPackageAndRelease,
+		release: firstReleaseCrate(inputs, cratesToPackageAndRelease)
+	};
+}
+
+// From README:
+//
+// When the action is run in a workspace, it will build and package all crates in the workspace by
+// default, but it will use the "first" binary crate as the source for the names and versions of the
+// release and package, and only publish that one to crates.io.
+//
+// That "first" crate is determined by sorting the names of all binary crates in the workspace in
+// lexicographic order, and using the first one, or by the first entry in the crates input. If the
+// first entry in the crates input is a glob pattern, the first lexicographic match in its expansion
+// will be used. This is also called the release-name (e.g. in the package-name template).
+function firstReleaseCrate(
+	inputs: InputsType,
+	crates: CargoPackage[]
+): CargoPackage {
+	let name: string;
+	if (inputs.build.crates.length === 1 && inputs.build.crates[0] === '*') {
+		// That's the default; we can't really differentiate between it and an explicit set.
+		name = crates
+			.filter(c =>
+				c.targets.some(
+					t => t.kind.includes('bin') || t.crate_types.includes('bin')
+				)
+			)
+			.map(c => c.name)
+			.sort()[0];
+	} else {
+		const firstPattern = new PatternList([inputs.build.crates[0]]);
+		name = firstPattern.matchListBy(crates, c => c.name)[0].name;
+	}
+
+	const crate = crates.find(c => c.name === name);
+	if (!crate) {
+		throw new Error('Could not find release crate: no binary crate?');
+	}
+
+	return crate;
 }

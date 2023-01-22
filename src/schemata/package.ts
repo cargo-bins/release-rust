@@ -7,7 +7,7 @@ import {newlineList, Pattern} from './common';
 
 const SCHEMA = object({
 	archive: string()
-		.oneOf(['none', 'zip', 'tar+gzip', 'tar-bzip2', 'tar+xz', 'tar+zstd'])
+		.oneOf(['none', 'zip', 'tar+gzip', 'tar+bzip2', 'tar+xz', 'tar+zstd'])
 		.default('zip')
 		.required(),
 	files: array()
@@ -41,7 +41,7 @@ export interface Package {
 	sign: boolean;
 }
 
-export type ArchiveFormat = 'none' | 'zip' | 'tar+gzip' | 'tar-bzip2' | 'tar+xz' | `tar+zstd`;
+export type ArchiveFormat = 'none' | 'zip' | 'tar+gzip' | 'tar+bzip2' | 'tar+xz' | 'tar+zstd';
 
 export async function getPackage(): Promise<Package> {
 	const inputs = await SCHEMA.validate({

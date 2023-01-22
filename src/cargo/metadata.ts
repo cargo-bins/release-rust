@@ -18,6 +18,7 @@ export interface CargoMetadata {
 }
 
 export interface CargoPackage {
+	id: string;
 	name: string;
 	version: string;
 	source: null | string;
