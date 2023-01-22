@@ -1,3 +1,5 @@
+**IN DEVELOPMENT, DO NOT USE YET**
+
 # ![Action: release-rust](./assets/title.png)
 
 An all-in-one action to build, optimise, tag, sign, and publish a Cargo-based Rust project.
