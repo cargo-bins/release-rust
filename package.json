@@ -39,7 +39,7 @@
 		"@types/shell-quote": "^1.7.1",
 		"@types/ssri": "^7.1.1",
 		"@typescript-eslint/parser": "^5.49.0",
-		"@vercel/ncc": "^0.36.0",
+		"@vercel/ncc": "^0.36.1",
 		"eslint": "^8.32.0",
 		"eslint-plugin-github": "^4.3.2",
 		"eslint-plugin-jest": "^27.2.1",
