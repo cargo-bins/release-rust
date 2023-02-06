@@ -957,14 +957,14 @@ At the root of the `RELEASE_PACKAGING_DIR`, a `crates.json` file contains an arr
 This action doesn't exist in a vacuum. Not only are there related actions which can be used in
 conjunction with this one, there are alternatives which may be more suitable or just more familiar.
 
-### [cargo-binstall/release-pr][release-pr] and [cargo-binstall/release-meta][release-meta]
+### [cargo-bins/release-pr][release-pr] and [cargo-bins/release-meta][release-meta]
 
 These are release management actions, by the same author as this one. Release-PR uses cargo-release
 to create a PR which bumps the version of the crate, so that releases can be submitted and reviewed
 collaboratively. It also adds JSON metadata in a comment on the PR, which can be read with the
 release-meta companion action to reliably trigger an actual release when a release PR is merged.
 
-### [cargo-binstall/release-lipo][release-lipo]
+### [cargo-bins/release-lipo][release-lipo]
 
 This action is a little helper which downloads archives on an existing GitHub Release, extracts
 pre-built binaries for macOS Intel and ARM targets, and combines them into a universal binary, which
