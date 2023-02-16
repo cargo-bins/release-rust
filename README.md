@@ -1043,8 +1043,5 @@ may be simpler to use! Has support for stripping and compressing binaries with U
 This isn't an action but a tool to configure Continuous Delivery (CD) for a Cargo project, to build
 and publish binaries for all supported platforms. It's a _lot_ easier to use than this action! Use
 cargo-dist if you want to get set up quickly and don't need signing or the advanced features we got;
-you can always switch to this action later. Cargo-dist also aims to support more CI providers, while
-we're GitHub Actions only.
-
-Using [release-manifest], you can also write the `dist-manifest.json` file to the release the same
-way cargo-dist does, so tools which consume it will keep working seamlessly!
+you can always switch to this action later (and use [release-manifest] to keep compatible!).
+Cargo-dist also aims to support more CI providers, while we're GitHub Actions only.
