@@ -1,5 +1,6 @@
 import {join} from 'node:path';
 import {error, info} from '@actions/core';
+
 import {execAndSucceed, runHook} from '../common/exec';
 import {glob} from '../common/glob';
 import {InputsType} from '../schemata/index';
@@ -20,7 +21,7 @@ export default async function signPhase(inputs: InputsType): Promise<void> {
 		info('Skipping signing');
 	}
 
-	await runHook(inputs, 'post-sign');
+	await runHook(inputs, 'post-sign', {}, inputs.package.output);
 }
 
 async function signOutput(inputs: InputsType, output: string): Promise<void> {

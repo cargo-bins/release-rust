@@ -1,8 +1,8 @@
+import {mkdtemp, writeFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {debug} from '@actions/core';
 import {cp, mkdirP} from '@actions/io';
-import {mkdtemp, writeFile} from 'node:fs/promises';
-import {release, tmpdir} from 'node:os';
-import {join} from 'node:path';
 
 import {CargoPackage} from '../cargo/metadata';
 import {
@@ -93,10 +93,15 @@ export default async function packagePhase(
 		await archive(inputs, packageName, join(packagingDir, release.name));
 	}
 
-	await runHook(inputs, 'post-package', {
-		RELEASE_PACKAGE_SEPARATELY: inputs.package.separately.toString(),
-		RELEASE_PACKAGING_DIR: packagingDir
-	});
+	await runHook(
+		inputs,
+		'post-package',
+		{
+			RELEASE_PACKAGE_SEPARATELY: inputs.package.separately.toString(),
+			RELEASE_PACKAGING_DIR: packagingDir
+		},
+		inputs.package.output
+	);
 }
 
 async function prepareCrate(
