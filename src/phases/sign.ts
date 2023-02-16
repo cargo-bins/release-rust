@@ -1,5 +1,5 @@
 import {join} from 'node:path';
-import {debug, error, info} from '@actions/core';
+import {error, info} from '@actions/core';
 import {execAndSucceed, runHook} from '../common/exec';
 import {glob} from '../common/glob';
 import {InputsType} from '../schemata/index';
