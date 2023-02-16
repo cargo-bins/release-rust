@@ -1,8 +1,7 @@
 import {info} from '@actions/core';
-import {parse as shellParse} from 'shell-quote';
-
 import {CargoPackage} from '../cargo/metadata';
 import {execAndSucceedWithOutput, hookEnv, runHook} from '../common/exec';
+import {extraFlags} from '../common/flags';
 import {InputsType} from '../schemata/index';
 import {runnerHostTarget} from '../schemata/setup';
 import {allowedCrossTarget} from '../targets/cross';
@@ -75,29 +74,11 @@ export default async function buildPhase(
 		}
 
 		if (inputs.extras.rustcFlags) {
-			const extraFlags = shellParse(
-				inputs.extras.rustcFlags.join(' '),
-				hookEnv(inputs)
-			);
-			if (extraFlags.some(flag => typeof flag !== 'string')) {
-				throw new Error(
-					'extra-rustc-flags cannot contain shell operators'
-				);
-			}
-			rustflags.push(...(extraFlags as string[]));
+			rustflags.push(...extraFlags(inputs, 'rustcFlags'));
 		}
 
 		if (inputs.extras.cargoFlags) {
-			const extraFlags = shellParse(
-				inputs.extras.cargoFlags.join(' '),
-				hookEnv(inputs)
-			);
-			if (extraFlags.some(flag => typeof flag !== 'string')) {
-				throw new Error(
-					'extra-cargo-flags cannot contain shell operators'
-				);
-			}
-			rustflags.push(...(extraFlags as string[]));
+			buildArgs.push(...extraFlags(inputs, 'cargoFlags'));
 		}
 
 		info(`Rust flags: ${rustflags.join(' ')}`);

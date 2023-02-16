@@ -61,7 +61,7 @@ steps:
   + [Filtering crates](#filtering-crates)
   + [Filtering binaries](#filtering-binaries)
   + [Publishing to crates.io before or after packaging anything](#publishing-to-cratesio-before-or-after-packaging-anything)
-  + [Extra signing attestations](#extra-signing-attestations)
+  + [Provide checksum files](#provide-checksum-files)
   + [Distribute signatures alongside packages](#distribute-signatures-alongside-packages)
   + [Sign using GPG instead](#sign-using-gpg-instead)
 - **Documentation**
@@ -436,17 +436,67 @@ jobs:
 
 You should take note of [the particular behaviour of the `publish-crate-only` option](#cratesio-publish-only-mode).
 
-### Extra signing attestations
+### Provide checksum files
 
-TODO: with extra cosign flags
+While signatures should be preferred, it can be a good practice to provide checksum files alongside
+the packages. This can be done with the `post-sign` hook, to avoid checksum files being signed:
+
+```yaml
+- uses: cargo-bins/release-rust@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    post-sign: |
+      cd "$RELEASE_PACKAGE_OUTPUT"
+      for file in *; do
+        sha256sum "$file" | cut -d ' ' -f 1 > "$file.sha256"
+      done
+```
+
+Any file in the `$RELEASE_PACKAGE_OUTPUT` directory will be uploaded as a release asset.
 
 ### Distribute signatures alongside packages
 
-TODO: use extra cosign flags to write sig to outside, use post-package hook to bring sig files back in
+By default, sigstore signatures and certificates are not distributed alongside the packages. This
+means that to verify a package, one must compute the SHA256 checksum of the package, and use it to
+look up the signature and certificate from Rekor.
+
+However, you sometimes want to distribute these alongside the package, to make it easier to verify
+or to designate a specific certificate as the official one.
+
+```yaml
+- uses: cargo-bins/release-rust@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    extra-cosign-flags: |
+      # write the signature in binary and the certificate in PEM
+      --b64=false
+      # the $OUTPUT variable is the name of the file being signed
+      --output-certificate "$OUTPUT.pem"
+      --output-signature "$OUTPUT.sig"
+```
 
 ### Sign using GPG instead
 
-TODO: disable sigstore, using post-sign hook to sign and write sig to outside, use post-package hook to bring sig files back in
+When `package-sign` is `false`, the packages won't be signed with cosign, but the `post-sign` hook
+will still run. You can use that to sign the packages with other tools, like GPG:
+
+```yaml
+- uses: cargo-bins/release-rust@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    crates-token: ${{ secrets.CRATES_TOKEN }}
+    target: ${{ matrix.target }}
+    package-sign: false
+    post-sign: |
+      cd "$RELEASE_PACKAGE_OUTPUT"
+      for file in *; do
+        gpg --detach-sign --armor "$file"
+      done
+```
 
 ## Inputs
 
@@ -706,8 +756,6 @@ workflow, you should not use this action, and do something like this instead:
 
 ## Signing
 
-TODO: This section is still provisional.
-
 Signing uses [sigstore]'s public infrastructure.
 
 Artifact signing using Sigstore works by obtaining the SHA256 checksum of an artifact, signing that
@@ -845,7 +893,8 @@ _The `post-package` hook is run (only once)._
 
 If `package-sign` is `true`, then for each file in the `package-output` directory:
 
-- The file is signed with `cosign sign-blob`, using GitHub's OIDC identity and keyless signing.
+- The file is signed with `cosign sign-blob --yes`, using GitHub's OIDC identity and keyless signing.
+  - If signing fails, the file is skipped and an error is logged.
 
 _The `post-sign` hook is run (only once)._
 
