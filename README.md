@@ -1017,7 +1017,14 @@ release-meta companion action to reliably trigger an actual release when a relea
 
 This action is a little helper which downloads archives on an existing GitHub Release, extracts
 pre-built binaries for macOS Intel and ARM targets, and combines them into a universal binary, which
-it then uploads to the same release.
+it then signs and uploads to the same release.
+
+### [cargo-bins/release-manifest][release-manifest]
+
+[release-manifest]: https://github.com/cargo-bins/release-manifest
+
+This action downloads archives on an existing GitHub Release, and builds a manifest of the packages
+and their contents, in [cargo-dist] format. It then uploads the manifest to the same release.
 
 ### [taiki-e/install-action](https://github.com/taiki-e/install-action)
 
@@ -1029,13 +1036,15 @@ This is an older action with a similar purpose as this one, but a more limited s
 approach. It exclusively uses cross-compilation from Linux and only supports a few targets, but it
 may be simpler to use! Has support for stripping and compressing binaries with UPX.
 
-### [cargo-dist](https://github.com/axodotdev/cargo-dist)
+### [cargo-dist]
+
+[cargo-dist]: https://github.com/axodotdev/cargo-dist
 
 This isn't an action but a tool to configure Continuous Delivery (CD) for a Cargo project, to build
 and publish binaries for all supported platforms. It's a _lot_ easier to use than this action! Use
 cargo-dist if you want to get set up quickly and don't need signing or the advanced features we got;
-you can always switch to this action later. Cargo-dist also supports more CI providers, while we're
-GitHub Actions only.
+you can always switch to this action later. Cargo-dist also aims to support more CI providers, while
+we're GitHub Actions only.
 
-We also write the `dist-manifest.json` file to the release the same way cargo-dist does, so tools
-which consume it will keep working seamlessly!
+Using [release-manifest], you can also write the `dist-manifest.json` file to the release the same
+way cargo-dist does, so tools which consume it will keep working seamlessly!
