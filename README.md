@@ -1,4 +1,4 @@
-**IN DEVELOPMENT, DO NOT USE YET**
+**While all the functionality is here, this action is alpha quality. If you use it, you *will* experience frustration. For production or stress-free use, wait for v1.**
 
 # ![Action: release-rust](./assets/title.png)
 
@@ -43,7 +43,7 @@ permissions:
 
 steps:
 - uses: actions/checkout@v3
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -119,7 +119,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - uses: cargo-bins/release-rust@v1
+    - uses: cargo-bins/release-rust@v0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -159,7 +159,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - uses: cargo-bins/release-rust@v1
+    - uses: cargo-bins/release-rust@v0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -177,7 +177,7 @@ dependency after the action finishes setting up the build environment.
 [compiler-rt]: https://compiler-rt.llvm.org
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -198,7 +198,7 @@ the `rust-src` component by default, so we add it manually as well.
 [just]: https://just.systems
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -222,7 +222,7 @@ put anything in the places the action expects to find them. Note that this examp
 [pods]: https://github.com/marhkb/pods
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     target: ${{ matrix.target }}
@@ -244,7 +244,7 @@ from the binary. This is done by forcing `panic = "abort"` in the release profil
 immediate-abort-on-panic feature for `build-std`:
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -293,7 +293,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - uses: cargo-bins/release-rust@v1
+    - uses: cargo-bins/release-rust@v0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -319,7 +319,7 @@ Within a workspace, sometimes only a subset of crates should be build and packag
 crates is adjustable with the `crates` option, which takes a newline-separated list of crate names:
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -332,7 +332,7 @@ crates is adjustable with the `crates` option, which takes a newline-separated l
 When there are many crates with similar names, you can use glob patterns to match them:
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -348,7 +348,7 @@ workspace, then filter that list by the glob patterns.
 You can also use negative patterns to exclude crates:
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -369,7 +369,7 @@ To filter these, use the [`pre-package` hook] to run a script that will remove u
 [`pre-package` hook]: #package-phase
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -399,7 +399,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: cargo-bins/release-rust@v1
+    - uses: cargo-bins/release-rust@v0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -426,7 +426,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - uses: cargo-bins/release-rust@v1
+    - uses: cargo-bins/release-rust@v0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         target: ${{ matrix.t }}
@@ -442,7 +442,7 @@ While signatures should be preferred, it can be a good practice to provide check
 the packages. This can be done with the `post-sign` hook, to avoid checksum files being signed:
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -466,7 +466,7 @@ However, you sometimes want to distribute these alongside the package, to make i
 or to designate a specific certificate as the official one.
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
@@ -485,7 +485,7 @@ When `package-sign` is `false`, the packages won't be signed with cosign, but th
 will still run. You can use that to sign the packages with other tools, like GPG:
 
 ```yaml
-- uses: cargo-bins/release-rust@v1
+- uses: cargo-bins/release-rust@v0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     crates-token: ${{ secrets.CRATES_TOKEN }}
