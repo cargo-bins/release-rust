@@ -8,7 +8,7 @@ import {cargoPublish} from '../cargo/publish';
 
 export default async function publishPhase(
 	inputs: InputsType
-): Promise<{crates: CargoPackage[]; release: CargoPackage}> {
+): Promise<{released: CargoPackage[]; published: CargoPackage[], release: CargoPackage}> {
 	const cargoMeta = await cargoMetadata();
 	const allLocalCrates = cargoMeta.packages.filter(p => p.source === null);
 	debug(
@@ -88,7 +88,8 @@ export default async function publishPhase(
 
 	await runHook(inputs, 'post-publish');
 	return {
-		crates: cratesToPackageAndRelease,
+		released: cratesToPackageAndRelease,
+		published: cratesToPublish,
 		release: firstReleaseCrate(inputs, cratesToPackageAndRelease)
 	};
 }
