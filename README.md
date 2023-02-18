@@ -1,4 +1,4 @@
-**While all the functionality is here, this action is alpha quality. If you use it, you *will* experience frustration. For production or stress-free use, wait for v1.**
+**While all the functionality is here, this action is alpha quality. If you use it, you *will* experience frustration. For production or stress-free use, [wait for v1](https://github.com/cargo-bins/release-rust/issues/6).**
 
 # ![Action: release-rust](./assets/title.png)
 
