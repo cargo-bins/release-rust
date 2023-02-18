@@ -35,15 +35,31 @@ function isPatternListOrBoolean(input: unknown): input is Pattern[] | boolean {
 }
 
 function parsePatternListOrBoolean(input: string): Pattern[] | boolean {
-	if (input === 'true') {
+	if (/true/i.test(input)) {
 		return true;
 	}
 
-	if (input === 'false') {
+	if (/false/i.test(input)) {
 		return false;
 	}
 
 	return newlineList(input);
+}
+
+function isStringOrBoolean(input: unknown): input is string | boolean {
+	return (typeof input === 'boolean' || typeof input === 'string');
+}
+
+function parseStringOrBoolean(input: string): string | boolean {
+	if (/true/i.test(input)) {
+		return true;
+	}
+
+	if (/false/i.test(input)) {
+		return false;
+	}
+
+	return input;
 }
 
 const SCHEMA = object({
@@ -54,8 +70,8 @@ const SCHEMA = object({
 		.required(),
 	notes: object().transform(detectPatternMap).default({'*': ''}).required(),
 	separately: boolean().default(false).required(),
-	latest: mixed(isPatternListOrBoolean)
-		.transform(parsePatternListOrBoolean)
+	latest: mixed(isStringOrBoolean)
+		.transform(parseStringOrBoolean)
 		.default(true)
 		.required(),
 	pre: mixed(isPatternListOrBoolean)
@@ -69,7 +85,7 @@ export interface Release {
 	name: PatternMap;
 	notes: PatternMap;
 	separately: boolean;
-	latest: boolean | Pattern[];
+	latest: boolean | string;
 	pre: boolean | Pattern[];
 }
 

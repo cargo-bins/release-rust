@@ -3,7 +3,7 @@ import {Minimatch} from 'minimatch';
 import { glob } from './glob';
 
 export class PatternList {
-	readonly patterns: Minimatch[];
+	readonly patterns: InstanceType<typeof Minimatch>[];
 
 	constructor(patterns: string[]) {
 		this.patterns = patterns.map(

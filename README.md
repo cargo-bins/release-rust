@@ -920,24 +920,29 @@ _The `post-tag` hook is run (only once)._
 
 If `release` is not `false`, and:
 - `release-separately` is `false`:
-  + The `release-name` input is evaluated as a template (same placeholders as [`package-name`](#packaging)).
-  + A release is created with the tag created in the previous phase:
+  + The `release-name` input is evaluated as a template (same placeholders as
+    [`package-name`](#packaging), plus `release-tag` set to the tag name).
+  + A release is created (if not already present) with the tag created in the previous phase:
     * its name as the `release-name` result;
-    * its body as the `release-body` input;
+    * its body as the `release-notes` input (evaluated as a template, same placeholders as
+      [`package-name`](#packaging), plus `release-tag` set to the tag name and `release-name` set to
+      the release name);
     * marked as latest if `release-latest` is equal to the `release-name` or not `false`;
     * marked as pre-release if `release-pre` is `true` or matching the `release-name`.
+  + All assets in the `package-output` directory are uploaded to the release.
 - otherwise, for each tag created in the previous phase:
-  + Each of the `release-name` and `release-body` inputs:
+  + Each of the `release-name` and `release-notes` inputs:
     * is attempted to parse as JSON. If it can be, and it is an object, each key is evaluated as a
       glob pattern against the list of crates, from most precise (proportion of glob characters) to
       least, and the first match is used. If no match is found, the action fails. If the value is
       not JSON, this step is skipped.
     * the value is then evaluated as a template with that crate's `crate-name` and `crate-version`.
-  + A release is created with the tag:
+  + A release is created (if not already present) with the tag:
     * its name as the `release-name` result;
-    * its body as the `release-body` input;
+    * its body as the `release-notes` input;
     * marked as latest if `release-latest` is equal to the `release-name` or not `false`;
     * marked as pre-release if `release-pre` is `true` or matching the `release-name`.
+  + TODO: figure out which assets to upload.
 
 _The `post-release` hook is run (only once)._
 

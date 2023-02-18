@@ -12,21 +12,23 @@ export default async function tagPhase(
 	inputs: InputsType,
 	release: CargoPackage,
 	crates: CargoPackage[]
-): Promise<void> {
+): Promise<TaggedRelease[]> {
+	const tags = [];
+
 	if (inputs.tag.enabled) {
 		info('Fetch and create tags as needed');
 		await execAndSucceed('git', ['fetch', '--tags']);
 
 		if (!inputs.publish.allCrates && !inputs.release.separately) {
-			await tagTheThing(inputs, release, release);
+			tags.push(await tagTheThing(inputs, release, release));
 		} else {
 			for (const crate of crates) {
-				await tagTheThing(inputs, crate, release);
+				tags.push(await tagTheThing(inputs, crate, release));
 			}
 
 			if (!crates.some(crate => crate.name === release.name)) {
 				// if the release-crate is not within the set of published crates
-				await tagTheThing(inputs, release, release);
+				tags.push(await tagTheThing(inputs, release, release));
 			}
 		}
 
@@ -35,13 +37,19 @@ export default async function tagPhase(
 	}
 
 	await runHook(inputs, 'post-tag');
+	return tags;
+}
+
+export interface TaggedRelease {
+	tagName: string;
+	crate: CargoPackage;
 }
 
 async function tagTheThing(
 	inputs: InputsType,
 	crate: CargoPackage,
 	release: CargoPackage
-): Promise<void> {
+): Promise<TaggedRelease> {
 	debug(`Rendering tag for ${crate.name}`);
 	const tagName = renderTemplate(inputs.tag.name ?? crate.version, {
 		target: inputs.setup.target,
@@ -59,7 +67,10 @@ async function tagTheThing(
 	const tags = await execAndSucceedWithOutput('git', ['tag', '-l']);
 	if (tags.stdout.split('\n').includes(tagName)) {
 		debug(`Tag ${tagName} already exists, skipping`);
-		return;
+		return {
+			tagName,
+			crate
+		};
 	}
 
 	info(`Tagging ${crate.name} as ${tagName} with message "${tagMessage}"`);
@@ -71,4 +82,9 @@ async function tagTheThing(
 		tagMessage,
 		...(inputs.tag.sign ? ['-s'] : [])
 	]);
+
+	return {
+		tagName,
+		crate
+	};
 }

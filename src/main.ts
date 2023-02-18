@@ -44,10 +44,10 @@ import {buildStdEnabled} from './targets/build-std';
 		await phase.sign(inputs);
 
 		debug('TAG PHASE');
-		await phase.tag(inputs, release, published);
+		const tagged = await phase.tag(inputs, release, published);
 
 		debug('RELEASE PHASE');
-		await phase.release(inputs, released);
+		await phase.release(inputs, release, tagged);
 
 		debug('DONE');
 		return;
