@@ -27,7 +27,25 @@ export default async function releasePhase(
 		) as CrateManifest[];
 
 		if (inputs.release.separately) {
-			// TODO
+			for (const tag of tags) {
+				info(`Releasing tag ${tag.tagName}`);
+				const releaseId = await ensureReleaseExists(
+					inputs,
+					tag,
+					release
+				);
+
+				const manifest = manifests.find(
+					({name}) => name === tag.crate.name
+				);
+				const files = new Set(
+					(manifest?.packageFiles ?? []).map(file =>
+						join(inputs.package.output, file)
+					)
+				);
+
+				await uploadAssets(inputs, releaseId, files);
+			}
 		} else {
 			const tag = tags.find(tag => tag.crate.name === release.name);
 			if (!tag) {
@@ -52,8 +70,10 @@ export default async function releasePhase(
 }
 
 function patternPrecision(pattern: Pattern): number {
-	const specials = pattern.split('').filter(char => ['?', '*', '{', '}'].includes(char)).length;
-	return 1 - (specials / pattern.length);
+	const specials = pattern
+		.split('')
+		.filter(char => ['?', '*', '{', '}'].includes(char)).length;
+	return 1 - specials / pattern.length;
 }
 
 function mapPatternFor(map: PatternMap, crateName: string): string | null {
@@ -242,8 +262,10 @@ async function uploadAssets(
 	info(`Uploading ${files.size} assets to release ${releaseId}`);
 	let uploaded = 0;
 	for (const file of files) {
-		if (!await fileExists(file)) {
-			warning(`Asset ${file} does not exist (or cannot be read), skipping`);
+		if (!(await fileExists(file))) {
+			warning(
+				`Asset ${file} does not exist (or cannot be read), skipping`
+			);
 			continue;
 		}
 
