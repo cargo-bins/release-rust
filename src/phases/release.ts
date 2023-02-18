@@ -51,8 +51,17 @@ export default async function releasePhase(
 	await runHook(inputs, 'post-release');
 }
 
+function patternPrecision(pattern: Pattern): number {
+	const specials = pattern.split('').filter(char => ['?', '*', '{', '}'].includes(char)).length;
+	return 1 - (specials / pattern.length);
+}
+
 function mapPatternFor(map: PatternMap, crateName: string): string | null {
-	for (const [pattern, template] of Object.entries(map)) {
+	const ordered = Object.entries(map).sort(
+		([a], [b]) => patternPrecision(b) - patternPrecision(a)
+	);
+
+	for (const [pattern, template] of ordered) {
 		if (
 			new Minimatch(pattern, {
 				debug: isDebug()
