@@ -1,3 +1,4 @@
+import {readFile} from 'node:fs/promises';
 import {basename, join} from 'node:path';
 import {debug, error, info, isDebug, warning} from '@actions/core';
 import {getOctokit} from '@actions/github';
@@ -11,6 +12,7 @@ import {InputsType} from '../schemata/index';
 import {CargoPackage} from '../cargo/metadata';
 import {renderTemplate} from '../common/template';
 import {TaggedRelease} from './tag';
+import {CrateManifest} from './package';
 
 export default async function releasePhase(
 	inputs: InputsType,
@@ -18,6 +20,12 @@ export default async function releasePhase(
 	tags: TaggedRelease[]
 ): Promise<void> {
 	if (inputs.release.enabled) {
+		const manifestPath = join(inputs.package.output, '.crates.json');
+		debug(`Reading ${manifestPath}`);
+		const manifests = JSON.parse(
+			await readFile(manifestPath, 'utf-8')
+		) as CrateManifest[];
+
 		if (inputs.release.separately) {
 			// TODO
 		} else {
@@ -27,7 +35,16 @@ export default async function releasePhase(
 			}
 
 			const releaseId = await ensureReleaseExists(inputs, tag, release);
-			await uploadAssets(inputs, releaseId);
+
+			const files = new Set(
+				(await glob(join(inputs.package.output, '*'))).concat(
+					(manifests[0]?.packageFiles ?? []).map(file =>
+						join(inputs.package.output, file)
+					)
+				)
+			);
+
+			await uploadAssets(inputs, releaseId, files);
 		}
 	}
 
@@ -199,12 +216,12 @@ async function createRelease(
 
 async function uploadAssets(
 	inputs: InputsType,
-	releaseId: number
+	releaseId: number,
+	files: Set<string>
 ): Promise<void> {
 	const [owner, repo] = process.env.GITHUB_REPOSITORY!.split('/');
-	const files = await glob(join(inputs.package.output, '*'));
 
-	info(`Uploading ${files.length} assets to release ${releaseId}`);
+	info(`Uploading ${files.size} assets to release ${releaseId}`);
 	let uploaded = 0;
 	for (const file of files) {
 		for (const attempt of [1, 2, 3]) {
@@ -239,5 +256,5 @@ async function uploadAssets(
 			}
 		}
 	}
-	info(`Uploaded ${uploaded}/${files.length} assets to release ${releaseId}`);
+	info(`Uploaded ${uploaded}/${files.size} assets to release ${releaseId}`);
 }

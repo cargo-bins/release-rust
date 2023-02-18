@@ -60,7 +60,7 @@ export default async function packagePhase(
 		);
 	}
 
-	const manifestPath = join(packagingDir, 'crates.json');
+	const manifestPath = join(inputs.package.output, '.crates.json');
 	debug(`Writing ${manifestPath}`);
 	await writeFile(manifestPath, JSON.stringify(manifests, null, 2));
 
@@ -71,27 +71,42 @@ export default async function packagePhase(
 
 	if (inputs.package.separately) {
 		for (const crate of crates) {
-			const {packageName} = manifests.find(
+			const manifest = manifests.find(
 				manifest => manifest.name === crate.name
 			)!;
+
 			await runHook(inputs, 'pre-package', {
 				...hooksEnv,
-				RELEASE_PACKAGE_NAME: packageName,
+				RELEASE_PACKAGE_NAME: manifest.packageName,
 				RELEASE_PACKAGE_CRATE_NAME: crate.name,
 				RELEASE_PACKAGE_CRATE_VERSION: crate.version
 			});
-			await archive(inputs, packageName, join(packagingDir, crate.name));
+
+			const pkgfile = await archive(
+				inputs,
+				manifest.packageName,
+				join(packagingDir, crate.name)
+			);
+			if (pkgfile) manifest.packageFiles.push(pkgfile);
 		}
 	} else {
-		const {packageName} = manifests[0]!;
+		const manifest = manifests[0]!;
 		await runHook(inputs, 'pre-package', {
 			...hooksEnv,
-			RELEASE_PACKAGE_NAME: packageName,
+			RELEASE_PACKAGE_NAME: manifest.packageName,
 			RELEASE_PACKAGE_CRATE_NAME: release.name,
 			RELEASE_PACKAGE_CRATE_VERSION: release.version
 		});
-		await archive(inputs, packageName, join(packagingDir, release.name));
+		const pkgfile = await archive(
+			inputs,
+			manifest.packageName,
+			join(packagingDir, release.name)
+		);
+		if (pkgfile) manifest.packageFiles.push(pkgfile);
 	}
+
+	debug(`Writing ${manifestPath} (with packageFiles)`);
+	await writeFile(manifestPath, JSON.stringify(manifests, null, 2));
 
 	await runHook(
 		inputs,
@@ -145,8 +160,9 @@ async function prepareCrate(
 	return {
 		name: crate.name,
 		version: crate.version,
+		files,
 		packageName,
-		files
+		packageFiles: []
 	};
 }
 
@@ -190,25 +206,27 @@ async function prepareWhole(
 	return {
 		name: release.name,
 		version: release.version,
+		files,
 		packageName,
-		files
+		packageFiles: []
 	};
 }
 
-interface CrateManifest {
+export interface CrateManifest {
 	name: string;
 	version: string;
-	packageName: string;
 	files: string[];
+	packageName: string;
+	packageFiles: string[];
 }
 
 async function archive(
 	inputs: InputsType,
 	packageName: string,
 	fromDir: string
-): Promise<void> {
+): Promise<string | null> {
 	const {archive, shortExt} = inputs.package;
-	if (archive === 'none') return;
+	if (archive === 'none') return null;
 
 	let ext;
 	switch (archive) {
@@ -229,7 +247,8 @@ async function archive(
 			break;
 	}
 
-	const output = join(inputs.package.output, `${packageName}.${ext}`);
+	const filename = `${packageName}.${ext}`;
+	const output = join(inputs.package.output, filename);
 	debug(`Archiving ${fromDir} to ${output}`);
 
 	const fileList = await glob(join(fromDir, '*'), {dot: true});
@@ -242,6 +261,8 @@ async function archive(
 		await tar(fileList, tarname);
 		await compress(archive, tarname, output);
 	}
+
+	return filename;
 }
 
 async function zip(fileList: string[], toFile: string): Promise<void> {

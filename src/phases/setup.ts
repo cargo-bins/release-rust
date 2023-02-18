@@ -1,4 +1,4 @@
-import {readFile} from 'node:fs/promises';
+import {readFile, writeFile} from 'node:fs/promises';
 import {homedir} from 'node:os';
 import {basename, join} from 'node:path';
 
@@ -30,7 +30,27 @@ export default async function setupPhase(inputs: InputsType): Promise<void> {
 
 	await configureGitUser();
 
+	await manifestUtils();
+
 	await runHook(inputs, 'post-setup');
+}
+
+async function manifestUtils(): Promise<void> {
+	info('Installing .crates.json manifest manipulation tools...');
+	await mkdirP(join(homedir(), '.cargo', 'bin'));
+
+	debug('Installing _rr_add_pkg...');
+	await writeFile(
+		join(homedir(), '.cargo', 'bin', '_rr_add_pkg'),
+		`#!/bin/bash
+		set -euxo pipefail
+		cratefilter=\${1:?specify crate filter}
+		file=\${2:?specify file to add}
+		cp "$RELEASE_PACKAGE_OUTPUT/.crates.json" "$RELEASE_PACKAGE_OUTPUT/.crates.json.bak"
+		jq --indent 2 --ascii-output --arg file "$file" '[.[] | (if ('"$cratefilter"') then (.packageFiles += [$file]) else (.) end)]' "$RELEASE_PACKAGE_OUTPUT/.crates.json.bak" > "$RELEASE_PACKAGE_OUTPUT/.crates.json"
+		`,
+		{mode: 0o755}
+	);
 }
 
 async function rustup(inputs: InputsType): Promise<void> {
