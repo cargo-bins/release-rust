@@ -257,6 +257,8 @@ immediate-abort-on-panic feature for `build-std`:
 
 ### Universal binaries on macOS
 
+***The release-lipo action is not yet available.***
+
 A macOS concept is [universal binaries], which contain code for multiple architectures. This action
 cannot build these directly, but the companion [release-lipo] action will read from an existing
 release, download `*-apple-darwin` packages and extract them, combine the binaries with [`lipo`],
@@ -1060,11 +1062,15 @@ release-meta companion action to reliably trigger an actual release when a relea
 
 ### [cargo-bins/release-lipo][release-lipo]
 
+***Not yet available.***
+
 This action is a little helper which downloads archives on an existing GitHub Release, extracts
 pre-built binaries for macOS Intel and ARM targets, and combines them into a universal binary, which
 it then signs and uploads to the same release.
 
 ### [cargo-bins/release-manifest][release-manifest]
+
+***Not yet available.***
 
 [release-manifest]: https://github.com/cargo-bins/release-manifest
 
