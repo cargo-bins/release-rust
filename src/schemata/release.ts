@@ -47,7 +47,7 @@ function parsePatternListOrBoolean(input: string): Pattern[] | boolean {
 }
 
 function isStringOrBoolean(input: unknown): input is string | boolean {
-	return (typeof input === 'boolean' || typeof input === 'string');
+	return typeof input === 'boolean' || typeof input === 'string';
 }
 
 function parseStringOrBoolean(input: string): string | boolean {

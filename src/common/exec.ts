@@ -23,7 +23,7 @@ export async function execAndSucceedWithOutput(
 	command: string,
 	args: string[],
 	options?: ExecOptions
-): Promise<{ stdout: string; stderr: string; }> {
+): Promise<{stdout: string; stderr: string}> {
 	info(`Running command (grabbing output): ${command} ${args.join(' ')}`);
 
 	let stdout = '';
@@ -46,10 +46,10 @@ export async function execAndSucceedWithOutput(
 		throw new Error(`Command failed with exit code ${exitCode}`);
 	}
 
-	return { stdout, stderr };
+	return {stdout, stderr};
 }
 
-export function hookEnv(inputs: InputsType): { [key: string]: string } {
+export function hookEnv(inputs: InputsType): {[key: string]: string} {
 	return {
 		...process.env,
 		RELEASE_ROOT: process.cwd(), // TODO: actually compute workspace root?

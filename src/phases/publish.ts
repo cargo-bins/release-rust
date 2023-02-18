@@ -6,9 +6,11 @@ import {InputsType} from '../schemata/index';
 import {isVersionPublished} from '../cargo/api';
 import {cargoPublish} from '../cargo/publish';
 
-export default async function publishPhase(
-	inputs: InputsType
-): Promise<{released: CargoPackage[]; published: CargoPackage[], release: CargoPackage}> {
+export default async function publishPhase(inputs: InputsType): Promise<{
+	released: CargoPackage[];
+	published: CargoPackage[];
+	release: CargoPackage;
+}> {
 	const cargoMeta = await cargoMetadata();
 	const allLocalCrates = cargoMeta.packages.filter(p => p.source === null);
 	debug(
@@ -111,6 +113,7 @@ function firstReleaseCrate(
 	let name: string;
 	if (inputs.build.crates.length === 1 && inputs.build.crates[0] === '*') {
 		// That's the default; we can't really differentiate between it and an explicit set.
+		// eslint-disable-next-line @typescript-eslint/require-array-sort-compare
 		name = crates
 			.filter(c =>
 				c.targets.some(

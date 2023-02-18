@@ -1,4 +1,4 @@
-import { join } from 'node:path';
+import {join} from 'node:path';
 
 import {getInput} from '@actions/core';
 import {array, boolean, object, string} from 'yup';
@@ -20,7 +20,7 @@ const SCHEMA = object({
 		.when('separately', {
 			is: true,
 			then: schema => schema.default('{crate-name}-{target}'),
-			otherwise: schema => schema.default('{release-name}-{target}'),
+			otherwise: schema => schema.default('{release-name}-{target}')
 		})
 		.required(),
 	inDir: boolean().default(true).required(),
@@ -41,7 +41,13 @@ export interface Package {
 	sign: boolean;
 }
 
-export type ArchiveFormat = 'none' | 'zip' | 'tar+gzip' | 'tar+bzip2' | 'tar+xz' | 'tar+zstd';
+export type ArchiveFormat =
+	| 'none'
+	| 'zip'
+	| 'tar+gzip'
+	| 'tar+bzip2'
+	| 'tar+xz'
+	| 'tar+zstd';
 
 export async function getPackage(): Promise<Package> {
 	const inputs = await SCHEMA.validate({
@@ -57,6 +63,6 @@ export async function getPackage(): Promise<Package> {
 
 	return {
 		...inputs,
-		output: join(process.cwd(), inputs.output),
+		output: join(process.cwd(), inputs.output)
 	};
 }

@@ -10,7 +10,7 @@ const SCHEMA = object({
 	postPackage: string(),
 	postSign: string(),
 	postRelease: string(),
-	shell: string().default('bash').required(),
+	shell: string().default('bash').required()
 }).noUnknown();
 
 export interface Hooks {
@@ -35,6 +35,6 @@ export async function getHooks(): Promise<Hooks> {
 		postPackage: getInput('post-package'),
 		postSign: getInput('post-sign'),
 		postRelease: getInput('post-release'),
-		shell: getInput('shell'),
+		shell: getInput('shell')
 	});
 }

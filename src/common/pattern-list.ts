@@ -1,6 +1,6 @@
 import {debug, isDebug} from '@actions/core';
 import {Minimatch} from 'minimatch';
-import { glob } from './glob';
+import {glob} from './glob';
 
 export class PatternList {
 	readonly patterns: InstanceType<typeof Minimatch>[];
@@ -46,7 +46,7 @@ export class PatternList {
 		for (const pattern of this.patterns) {
 			if (pattern.negate) continue;
 			debug(`Running glob: "${pattern.pattern}"`);
-			files.push(...await glob(pattern.pattern));
+			files.push(...(await glob(pattern.pattern)));
 		}
 
 		debug(`Re-filtering to remove negated patterns`);

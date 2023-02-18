@@ -51,7 +51,10 @@ export async function getSetup(): Promise<Setup> {
 		crossVersion: getInput('cross-version')
 	});
 
-	if (inputs.binstallVersion && !satisfies(inputs.binstallVersion, '>=0.20.0')) {
+	if (
+		inputs.binstallVersion &&
+		!satisfies(inputs.binstallVersion, '>=0.20.0')
+	) {
 		throw new Error('binstall-version must be >=0.20.0');
 	}
 

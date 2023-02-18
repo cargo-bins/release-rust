@@ -1,5 +1,5 @@
-import { InputsType } from "../schemata/index";
-import { nightlyDate } from "../common/toolchain";
+import {InputsType} from '../schemata/index';
+import {nightlyDate} from '../common/toolchain';
 
 const BUILD_STD_TARGETS = [
 	// macOS

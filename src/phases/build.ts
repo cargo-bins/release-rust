@@ -44,7 +44,7 @@ export default async function buildPhase(
 
 		if (inputs.build.debuginfo) {
 			buildArgs.push(
-				`--config='profile.release.split-debuginfo=\"packed\"'`,
+				`--config='profile.release.split-debuginfo="packed"'`,
 				`--config='profile.release.debug=2'`
 			);
 		}

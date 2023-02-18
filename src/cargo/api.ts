@@ -3,7 +3,10 @@ import {CratesIO} from 'crates.io';
 
 const cratesIO = new CratesIO();
 
-export async function isVersionPublished(packageName: string, version: string): Promise<boolean> {
+export async function isVersionPublished(
+	packageName: string,
+	version: string
+): Promise<boolean> {
 	try {
 		debug(`Looking up ${packageName} ${version} on crates.io`);
 		await cratesIO.api.crates.getVersion(packageName, version);
@@ -11,7 +14,9 @@ export async function isVersionPublished(packageName: string, version: string): 
 		return true;
 	} catch (error) {
 		debug(`Response from crates.io: ${error}`);
-		debug(`Assuming we did not find ${packageName} ${version} on crates.io`);
+		debug(
+			`Assuming we did not find ${packageName} ${version} on crates.io`
+		);
 		return false;
 	}
 }

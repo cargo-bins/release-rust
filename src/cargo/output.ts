@@ -1,5 +1,5 @@
-import { dirname } from 'node:path';
-import { glob } from '../common/glob';
+import {dirname} from 'node:path';
+import {glob} from '../common/glob';
 
 import {CargoPackageTarget} from './metadata';
 
@@ -33,9 +33,9 @@ export interface ArtifactMessage {
 }
 
 export async function findDebugSymbols(filenames: string[]): Promise<void> {
-	for (const filename in filenames) {
+	for (const filename of filenames) {
 		const dir = dirname(filename);
-		filenames.push(...await glob(`${dir}/@(*.dSYM|*.pdb|*.dwp)`));
+		filenames.push(...(await glob(`${dir}/@(*.dSYM|*.pdb|*.dwp)`)));
 	}
 }
 

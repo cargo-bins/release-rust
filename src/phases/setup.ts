@@ -1,6 +1,6 @@
 import {readFile, writeFile} from 'node:fs/promises';
 import {homedir} from 'node:os';
-import {basename, join} from 'node:path';
+import {join} from 'node:path';
 
 import {addPath, debug, info} from '@actions/core';
 import {mkdirP, mv} from '@actions/io';
@@ -386,8 +386,8 @@ async function fetchLatestReleaseVersion(
 
 async function fetchSigstoreToolWithCosign(
 	url: string,
-	cosignPath: string = 'cosign',
-	sigsSuffix: string = '-keyless'
+	cosignPath = 'cosign',
+	sigsSuffix = '-keyless'
 ): Promise<string> {
 	const path = await downloadTool(url);
 	const sig = await downloadTool(`${url}${sigsSuffix}.sig`);

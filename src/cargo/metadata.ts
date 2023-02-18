@@ -40,7 +40,13 @@ export interface CargoPackageTarget {
 	test: boolean;
 }
 
-export type TargetKind = 'bin' | 'lib' | 'example' | 'test' | 'bench' | 'custom-build';
+export type TargetKind =
+	| 'bin'
+	| 'lib'
+	| 'example'
+	| 'test'
+	| 'bench'
+	| 'custom-build';
 export type CrateType =
 	| 'bin'
 	| 'lib'
