@@ -1,4 +1,4 @@
-import {readFile} from 'node:fs/promises';
+import {access, constants, readFile} from 'node:fs/promises';
 import {basename, join} from 'node:path';
 import {debug, error, info, isDebug, warning} from '@actions/core';
 import {getOctokit} from '@actions/github';
@@ -214,6 +214,15 @@ async function createRelease(
 	return data.id;
 }
 
+async function fileExists(file: string): Promise<boolean> {
+	try {
+		await access(file, constants.R_OK);
+		return true;
+	} catch (_: unknown) {
+		return false;
+	}
+}
+
 async function uploadAssets(
 	inputs: InputsType,
 	releaseId: number,
@@ -224,6 +233,11 @@ async function uploadAssets(
 	info(`Uploading ${files.size} assets to release ${releaseId}`);
 	let uploaded = 0;
 	for (const file of files) {
+		if (!await fileExists(file)) {
+			warning(`Asset ${file} does not exist (or cannot be read), skipping`);
+			continue;
+		}
+
 		for (const attempt of [1, 2, 3]) {
 			try {
 				if (attempt > 1) {
