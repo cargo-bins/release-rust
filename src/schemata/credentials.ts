@@ -1,6 +1,7 @@
-import {getInput} from '@actions/core';
 import {getOctokit} from '@actions/github';
 import {object, string} from 'yup';
+
+import {getInput} from './common';
 
 const SCHEMA = object({
 	github: string().required(),

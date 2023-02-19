@@ -1,7 +1,6 @@
-import {getInput} from '@actions/core';
 import {boolean, mixed, object} from 'yup';
 
-import {Pattern, PatternMap, newlineList} from './common';
+import {Pattern, PatternMap, newlineList, getInput} from './common';
 
 function isPatternMap(input: unknown): input is PatternMap {
 	return (

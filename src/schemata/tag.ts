@@ -1,5 +1,6 @@
-import {getInput} from '@actions/core';
 import {object, boolean, string} from 'yup';
+
+import {getInput} from './common';
 
 export const SCHEMA = object({
 	name: string().min(1).default('false').required(),
@@ -16,7 +17,7 @@ export interface Tag {
 
 export async function getTag(): Promise<Tag> {
 	const inputs = await SCHEMA.validate({
-		name: getInput('tag'),
+		name: getInput('tag') ?? 'true',
 		crates: getInput('tag-crates'),
 		sign: getInput('tag-sign')
 	});

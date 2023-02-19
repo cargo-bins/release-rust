@@ -1,6 +1,6 @@
-import {getInput} from '@actions/core';
 import {array, boolean, object, string} from 'yup';
 
+import {getInput} from './common';
 import {newlineList, Pattern} from './common';
 
 const SCHEMA = object({

@@ -1,13 +1,13 @@
-import {getInput} from '@actions/core';
 import {satisfies} from 'semver';
 import {object, string} from 'yup';
 
+import {getInput} from './common';
 import {Toolchain} from '../common/toolchain';
 
 const SCHEMA = object({
 	toolchain: string()
-		.matches(/^(stable|nightly|1[.]\d+[.]\d+|nightly-\d+-\d+-\d+)$/)
 		.default('nightly')
+		.matches(/^(stable|nightly|1[.]\d+[.]\d+|nightly-\d+-\d+-\d+)$/)
 		.required(),
 	target: string(),
 	binstallVersion: string(),

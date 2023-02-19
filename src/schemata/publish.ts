@@ -1,5 +1,6 @@
-import {getInput} from '@actions/core';
 import {object, boolean} from 'yup';
+
+import {getInput} from './common';
 
 const SCHEMA = object({
 	crate: boolean().default(true).required(),
