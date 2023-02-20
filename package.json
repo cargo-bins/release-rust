@@ -1,7 +1,7 @@
 {
 	"name": "release-rust",
 	"publish": false,
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"description": "All-in-one action to build, optimise, tag, sign, and publish a Cargo-based Rust project.",
 	"main": "lib/main.js",
 	"scripts": {
