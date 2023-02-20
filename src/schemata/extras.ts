@@ -1,7 +1,6 @@
 import {array, object, string} from 'yup';
 
-import {getInput} from './common';
-import {newlineList} from './common';
+import {getInput, newlineList} from './common';
 
 const SCHEMA = object({
 	rustupComponents: array()

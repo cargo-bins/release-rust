@@ -2,8 +2,7 @@ import {join} from 'node:path';
 
 import {array, boolean, object, string} from 'yup';
 
-import {getInput} from './common';
-import {newlineList, Pattern} from './common';
+import {getInput, newlineList, Pattern} from './common';
 
 const SCHEMA = object({
 	archive: string()

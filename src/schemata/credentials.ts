@@ -16,7 +16,7 @@ export interface Credentials {
 
 export async function getCredentials(): Promise<Credentials> {
 	const inputs = await SCHEMA.validate({
-		github: getInput('github-token', { required: true }),
+		github: getInput('github-token', {required: true}),
 		crates: getInput('crates-token')
 	});
 

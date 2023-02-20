@@ -1,3 +1,4 @@
+// eslint-disable @typescript-eslint/no-non-null-assertion
 import {access, constants, readFile} from 'node:fs/promises';
 import {basename, join} from 'node:path';
 import {debug, error, info, isDebug, warning} from '@actions/core';
