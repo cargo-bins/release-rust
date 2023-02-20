@@ -559,6 +559,7 @@ exports.release = release_1.default;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+// eslint-disable @typescript-eslint/no-non-null-assertion
 const promises_1 = __nccwpck_require__(3977);
 const node_os_1 = __nccwpck_require__(612);
 const node_path_1 = __nccwpck_require__(9411);
@@ -857,6 +858,7 @@ function firstReleaseCrate(inputs, crates) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+// eslint-disable @typescript-eslint/no-non-null-assertion
 const promises_1 = __nccwpck_require__(3977);
 const node_path_1 = __nccwpck_require__(9411);
 const core_1 = __nccwpck_require__(2186);
@@ -1474,7 +1476,6 @@ async function tagTheThing(inputs, crate, release) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getBuild = void 0;
-const core_1 = __nccwpck_require__(2186);
 const yup_1 = __nccwpck_require__(8281);
 const common_1 = __nccwpck_require__(6357);
 const SCHEMA = (0, yup_1.object)({
@@ -1497,13 +1498,13 @@ const SCHEMA = (0, yup_1.object)({
 }).noUnknown();
 async function getBuild() {
     return await SCHEMA.validate({
-        crates: (0, core_1.getInput)('crates'),
-        features: (0, core_1.getInput)('features'),
-        buildstd: (0, core_1.getInput)('buildstd'),
-        debuginfo: (0, core_1.getInput)('debuginfo'),
-        muslLibGcc: (0, core_1.getInput)('musl-libgcc'),
-        crtStatic: (0, core_1.getInput)('crt-static'),
-        useCross: (0, core_1.getInput)('use-cross')
+        crates: (0, common_1.getInput)('crates'),
+        features: (0, common_1.getInput)('features'),
+        buildstd: (0, common_1.getInput)('buildstd'),
+        debuginfo: (0, common_1.getInput)('debuginfo'),
+        muslLibGcc: (0, common_1.getInput)('musl-libgcc'),
+        crtStatic: (0, common_1.getInput)('crt-static'),
+        useCross: (0, common_1.getInput)('use-cross')
     });
 }
 exports.getBuild = getBuild;
@@ -1512,12 +1513,13 @@ exports.getBuild = getBuild;
 /***/ }),
 
 /***/ 6357:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.newlineList = void 0;
+exports.getInput = exports.newlineList = void 0;
+const core_1 = __nccwpck_require__(2186);
 function newlineList(str) {
     return str
         .split('\n')
@@ -1525,6 +1527,14 @@ function newlineList(str) {
         .filter(s => s.length > 0 && !s.startsWith('#'));
 }
 exports.newlineList = newlineList;
+// behaves more in line with what yup expects
+function getInput(name, options) {
+    const input = (0, core_1.getInput)(name, options);
+    if (input === '')
+        return undefined;
+    return input;
+}
+exports.getInput = getInput;
 
 
 /***/ }),
@@ -1536,17 +1546,17 @@ exports.newlineList = newlineList;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getCredentials = void 0;
-const core_1 = __nccwpck_require__(2186);
 const github_1 = __nccwpck_require__(5438);
 const yup_1 = __nccwpck_require__(8281);
+const common_1 = __nccwpck_require__(6357);
 const SCHEMA = (0, yup_1.object)({
     github: (0, yup_1.string)().required(),
     crates: (0, yup_1.string)().optional()
 }).noUnknown();
 async function getCredentials() {
     const inputs = await SCHEMA.validate({
-        github: (0, core_1.getInput)('github-token'),
-        crates: (0, core_1.getInput)('crates-token')
+        github: (0, common_1.getInput)('github-token', { required: true }),
+        crates: (0, common_1.getInput)('crates-token')
     });
     return {
         githubToken: inputs.github,
@@ -1566,7 +1576,6 @@ exports.getCredentials = getCredentials;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getExtras = void 0;
-const core_1 = __nccwpck_require__(2186);
 const yup_1 = __nccwpck_require__(8281);
 const common_1 = __nccwpck_require__(6357);
 const SCHEMA = (0, yup_1.object)({
@@ -1593,10 +1602,10 @@ const SCHEMA = (0, yup_1.object)({
 }).noUnknown();
 async function getExtras() {
     return await SCHEMA.validate({
-        rustupComponents: (0, core_1.getInput)('extra-rustup-components'),
-        cargoFlags: (0, core_1.getInput)('extra-cargo-flags'),
-        rustcFlags: (0, core_1.getInput)('extra-rustc-flags'),
-        cosignFlags: (0, core_1.getInput)('extra-cosign-flags')
+        rustupComponents: (0, common_1.getInput)('extra-rustup-components'),
+        cargoFlags: (0, common_1.getInput)('extra-cargo-flags'),
+        rustcFlags: (0, common_1.getInput)('extra-rustc-flags'),
+        cosignFlags: (0, common_1.getInput)('extra-cosign-flags')
     });
 }
 exports.getExtras = getExtras;
@@ -1611,8 +1620,8 @@ exports.getExtras = getExtras;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getHooks = void 0;
-const core_1 = __nccwpck_require__(2186);
 const yup_1 = __nccwpck_require__(8281);
+const common_1 = __nccwpck_require__(6357);
 const SCHEMA = (0, yup_1.object)({
     postSetup: (0, yup_1.string)(),
     postPublish: (0, yup_1.string)(),
@@ -1626,15 +1635,15 @@ const SCHEMA = (0, yup_1.object)({
 }).noUnknown();
 async function getHooks() {
     return await SCHEMA.validate({
-        postSetup: (0, core_1.getInput)('post-setup'),
-        postPublish: (0, core_1.getInput)('post-publish'),
-        customBuild: (0, core_1.getInput)('custom-build'),
-        postBuild: (0, core_1.getInput)('post-build'),
-        prePackage: (0, core_1.getInput)('pre-package'),
-        postPackage: (0, core_1.getInput)('post-package'),
-        postSign: (0, core_1.getInput)('post-sign'),
-        postRelease: (0, core_1.getInput)('post-release'),
-        shell: (0, core_1.getInput)('shell')
+        postSetup: (0, common_1.getInput)('post-setup'),
+        postPublish: (0, common_1.getInput)('post-publish'),
+        customBuild: (0, common_1.getInput)('custom-build'),
+        postBuild: (0, common_1.getInput)('post-build'),
+        prePackage: (0, common_1.getInput)('pre-package'),
+        postPackage: (0, common_1.getInput)('post-package'),
+        postSign: (0, common_1.getInput)('post-sign'),
+        postRelease: (0, common_1.getInput)('post-release'),
+        shell: (0, common_1.getInput)('shell')
     });
 }
 exports.getHooks = getHooks;
@@ -1687,7 +1696,6 @@ exports["default"] = getInputs;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getPackage = void 0;
 const node_path_1 = __nccwpck_require__(9411);
-const core_1 = __nccwpck_require__(2186);
 const yup_1 = __nccwpck_require__(8281);
 const common_1 = __nccwpck_require__(6357);
 const SCHEMA = (0, yup_1.object)({
@@ -1716,14 +1724,14 @@ const SCHEMA = (0, yup_1.object)({
 }).noUnknown();
 async function getPackage() {
     const inputs = await SCHEMA.validate({
-        archive: (0, core_1.getInput)('package-archive'),
-        files: (0, core_1.getInput)('package-files'),
-        name: (0, core_1.getInput)('package-name'),
-        inDir: (0, core_1.getInput)('package-in-dir'),
-        separately: (0, core_1.getInput)('package-separately'),
-        shortExt: (0, core_1.getInput)('package-short-ext'),
-        output: (0, core_1.getInput)('package-output'),
-        sign: (0, core_1.getInput)('package-sign')
+        archive: (0, common_1.getInput)('package-archive'),
+        files: (0, common_1.getInput)('package-files'),
+        name: (0, common_1.getInput)('package-name'),
+        inDir: (0, common_1.getInput)('package-in-dir'),
+        separately: (0, common_1.getInput)('package-separately'),
+        shortExt: (0, common_1.getInput)('package-short-ext'),
+        output: (0, common_1.getInput)('package-output'),
+        sign: (0, common_1.getInput)('package-sign')
     });
     return Object.assign(Object.assign({}, inputs), { output: (0, node_path_1.join)(process.cwd(), inputs.output) });
 }
@@ -1739,8 +1747,8 @@ exports.getPackage = getPackage;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getPublish = void 0;
-const core_1 = __nccwpck_require__(2186);
 const yup_1 = __nccwpck_require__(8281);
+const common_1 = __nccwpck_require__(6357);
 const SCHEMA = (0, yup_1.object)({
     crate: (0, yup_1.boolean)().default(true).required(),
     crateOnly: (0, yup_1.boolean)().default(false).required(),
@@ -1748,9 +1756,9 @@ const SCHEMA = (0, yup_1.object)({
 }).noUnknown();
 async function getPublish() {
     return await SCHEMA.validate({
-        crate: (0, core_1.getInput)('publish-crate'),
-        crateOnly: (0, core_1.getInput)('publish-crate-only'),
-        allCrates: (0, core_1.getInput)('publish-all-crates')
+        crate: (0, common_1.getInput)('publish-crate'),
+        crateOnly: (0, common_1.getInput)('publish-crate-only'),
+        allCrates: (0, common_1.getInput)('publish-all-crates')
     });
 }
 exports.getPublish = getPublish;
@@ -1765,7 +1773,6 @@ exports.getPublish = getPublish;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRelease = void 0;
-const core_1 = __nccwpck_require__(2186);
 const yup_1 = __nccwpck_require__(8281);
 const common_1 = __nccwpck_require__(6357);
 function isPatternMap(input) {
@@ -1832,12 +1839,12 @@ const SCHEMA = (0, yup_1.object)({
 }).noUnknown();
 async function getRelease() {
     return await SCHEMA.validate({
-        enabled: (0, core_1.getInput)('release'),
-        name: (0, core_1.getInput)('release-name'),
-        notes: (0, core_1.getInput)('release-notes'),
-        separately: (0, core_1.getInput)('release-separately'),
-        latest: (0, core_1.getInput)('release-latest'),
-        pre: (0, core_1.getInput)('release-pre')
+        enabled: (0, common_1.getInput)('release'),
+        name: (0, common_1.getInput)('release-name'),
+        notes: (0, common_1.getInput)('release-notes'),
+        separately: (0, common_1.getInput)('release-separately'),
+        latest: (0, common_1.getInput)('release-latest'),
+        pre: (0, common_1.getInput)('release-pre')
     });
 }
 exports.getRelease = getRelease;
@@ -1852,13 +1859,13 @@ exports.getRelease = getRelease;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getSetup = exports.runnerHostTarget = void 0;
-const core_1 = __nccwpck_require__(2186);
 const semver_1 = __nccwpck_require__(1383);
 const yup_1 = __nccwpck_require__(8281);
+const common_1 = __nccwpck_require__(6357);
 const SCHEMA = (0, yup_1.object)({
     toolchain: (0, yup_1.string)()
-        .matches(/^(stable|nightly|1[.]\d+[.]\d+|nightly-\d+-\d+-\d+)$/)
         .default('nightly')
+        .matches(/^(stable|nightly|1[.]\d+[.]\d+|nightly-\d+-\d+-\d+)$/)
         .required(),
     target: (0, yup_1.string)(),
     binstallVersion: (0, yup_1.string)(),
@@ -1883,13 +1890,13 @@ exports.runnerHostTarget = runnerHostTarget;
 async function getSetup() {
     var _a;
     const inputs = await SCHEMA.validate({
-        toolchain: (0, core_1.getInput)('toolchain'),
-        target: (0, core_1.getInput)('target'),
-        binstallVersion: (0, core_1.getInput)('binstall-version'),
-        cosignVersion: (0, core_1.getInput)('cosign-version'),
-        rekorVersion: (0, core_1.getInput)('rekor-version'),
-        gitsignVersion: (0, core_1.getInput)('gitsign-version'),
-        crossVersion: (0, core_1.getInput)('cross-version')
+        toolchain: (0, common_1.getInput)('toolchain'),
+        target: (0, common_1.getInput)('target'),
+        binstallVersion: (0, common_1.getInput)('binstall-version'),
+        cosignVersion: (0, common_1.getInput)('cosign-version'),
+        rekorVersion: (0, common_1.getInput)('rekor-version'),
+        gitsignVersion: (0, common_1.getInput)('gitsign-version'),
+        crossVersion: (0, common_1.getInput)('cross-version')
     });
     if (inputs.binstallVersion &&
         !(0, semver_1.satisfies)(inputs.binstallVersion, '>=0.20.0')) {
@@ -1921,18 +1928,19 @@ exports.getSetup = getSetup;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getTag = exports.SCHEMA = void 0;
-const core_1 = __nccwpck_require__(2186);
 const yup_1 = __nccwpck_require__(8281);
+const common_1 = __nccwpck_require__(6357);
 exports.SCHEMA = (0, yup_1.object)({
     name: (0, yup_1.string)().min(1).default('false').required(),
     crates: (0, yup_1.boolean)().default(true).required(),
     sign: (0, yup_1.boolean)().default(true).required()
 }).noUnknown();
 async function getTag() {
+    var _a;
     const inputs = await exports.SCHEMA.validate({
-        name: (0, core_1.getInput)('tag'),
-        crates: (0, core_1.getInput)('tag-crates'),
-        sign: (0, core_1.getInput)('tag-sign')
+        name: (_a = (0, common_1.getInput)('tag')) !== null && _a !== void 0 ? _a : 'true',
+        crates: (0, common_1.getInput)('tag-crates'),
+        sign: (0, common_1.getInput)('tag-sign')
     });
     const enabled = inputs.name !== 'false';
     return {
