@@ -24,7 +24,7 @@
 		"@actions/tool-cache": "^2.0.1",
 		"crates.io": "^2.2.2",
 		"glob": "^8.1.0",
-		"minimatch": "^5.0.1",
+		"minimatch": "^7.0.0",
 		"semver": "^7.3.8",
 		"shell-quote": "^1.7.4",
 		"ssri": "^10.0.1",
