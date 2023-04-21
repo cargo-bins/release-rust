@@ -35,7 +35,7 @@
 	},
 	"devDependencies": {
 		"@types/glob": "^8.0.1",
-		"@types/node": "^18.11.18",
+		"@types/node": "^18.15.13",
 		"@types/shell-quote": "^1.7.1",
 		"@types/ssri": "^7.1.1",
 		"@typescript-eslint/parser": "^5.49.0",
